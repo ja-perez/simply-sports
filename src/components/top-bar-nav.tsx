@@ -16,10 +16,12 @@ import Home from '@mui/icons-material/Home';
 import School from '@mui/icons-material/School';
 import LocalActivity from '@mui/icons-material/LocalActivity';
 import Sports from '@mui/icons-material/Sports';
+import SportsSoccer from '@mui/icons-material/SportsSoccer';
 
 
 const links = [
     { name: 'home', label: 'Home', href: '/', icon: Home, sections: ['about', 'features', 'background']},
+    { name: 'sports&news', label: 'Sports & News', href: '/sports-news', icon: SportsSoccer, sections: ['news', 'sports']},
     { name: 'learn', label: 'Learn', href: '/learn', icon: School, sections: ['tutorials', 'courses', 'resources']},
     { name: 'practice', label: 'Practice', href: '/practice', icon: LocalActivity, sections: ['lounge', 'tutorial']},
 ]
