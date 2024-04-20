@@ -54,7 +54,7 @@ export default function TopBarNav() {
                             id="app-toolbar"
                         >
                             <TopBarLeftSide />
-                            <TopBarProfile />
+                            {/* <TopBarRightSide/> */}
                         </Toolbar>
                     </Paper>
                 </Container>
@@ -79,7 +79,12 @@ function TopBarLeftSide() {
             <TopBarLinks />
         </Box>
     )
+}
 
+function TopBarRightSide() {
+    return (
+        <TopBarProfile />
+    )
 }
 
 function TopBarLogo() {
@@ -97,19 +102,19 @@ function TopBarLinks() {
     return (
         <Box sx={{ display: {xs: 'none', md: 'flex'} }}>
             {links.map((link) => (
-                <MenuItem
+                <Link
                     key={link.name}
-                    sx={{ py: '6px', px: '12px'}}
+                    href={link.href}
+                    className="py-6px px-12px "
                 >
-                    <Link
-                        href={link.href}
-                        className="py-6px px-12px onHover:bg-sky-100 hover:text-blue-600"
+                    <MenuItem
+                        sx={{ py: '6px', px: '12px'}}
                     >
                         <Typography variant="body2" >
                             {link.label}
                         </Typography>
-                    </Link>
-                </MenuItem>
+                    </MenuItem>
+                </Link>
             ))}
         </Box>
     )
