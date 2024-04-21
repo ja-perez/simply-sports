@@ -93,7 +93,7 @@ function TopBarLogo() {
     return (
         <Link href="/" className="flex items-center">
             <Sports />
-            <Typography variant="body1" className="hover:text-blue-600" sx={{ pr: '12px'}}>
+            <Typography variant="body1" sx={{ pr: '12px'}}>
                 SimplySports
             </Typography>
         </Link>

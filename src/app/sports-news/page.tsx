@@ -1,8 +1,14 @@
+import NewsFilter from "@/components/sports-news/news-filter";
+import NewsRibbon from "@/components/sports-news/news-ribbon";
+import NewsArticles from "@/components/sports-news/news-articles";
+
 export default function SportsNewsPage() {
     return (
         <>
             {/* Main Body */}
-            <h1>Sports News</h1>
+            <NewsFilter />
+            <NewsRibbon/>
+            <NewsArticles />
         </>
     );
 }
