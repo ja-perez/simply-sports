@@ -110,7 +110,7 @@ function TopBarLinks() {
                     className="py-6px px-12px "
                 >
                     <MenuItem
-                        sx={{ py: '6px', px: '12px'}}
+                        sx={{ py: '6px', px: '12px', borderRadius: '5px'}}
                     >
                         <Typography variant="body2" >
                             {link.label}
