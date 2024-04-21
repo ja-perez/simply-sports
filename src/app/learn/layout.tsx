@@ -1,20 +1,8 @@
 import TopBarNav from "@/components/top-bar-nav";
-import SideNav from "@/components/side-nav";
+import SideNav from "@/components/learn/side-nav";
 
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
-
-const sideNavProps = {
-    page_id: "learn",
-    subheader: "Learn Navigation",
-    links: [
-        { name: 'introduction', label: 'Introduction', href: '/learn/introduction'},
-        { name: 'terms', label: 'Terms', href: '/learn/terms'},
-        { name: 'practice', label: 'Practice', href: '/learn/practice'},
-        { name: 'resources', label: 'Resources', href: '/learn/resources'},
-    ],
-}
-
 
 export default function Layout({
     children,
@@ -39,8 +27,8 @@ export default function Layout({
 
                     {/* Side Navigation */}
                     <Grid item xs={2} id="learn-nav-grid-item">
-                        <SideNav page_id={sideNavProps.page_id} subheader={sideNavProps.subheader}
-                        links={sideNavProps.links} />
+                        <SideNav />
+
                     </Grid>
 
                     {/* Main Body */}
