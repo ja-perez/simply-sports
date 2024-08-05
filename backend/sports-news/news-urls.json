@@ -1,0 +1,14 @@
+{
+    "yahoo": {
+        "soccer": {
+            "news": {
+                "url": "https://sports.yahoo.com/soccer/news/",
+                "div-id": "rmp-container-Col1-0-RMPWrap-0-Rmp"
+            },
+            "premier-league": {
+                "url": "https://sports.yahoo.com/soccer/premier-league/",
+                "div-id": "Col1-1-SportsStream"
+            }
+        }
+    }
+}
