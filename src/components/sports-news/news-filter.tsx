@@ -37,8 +37,6 @@ export default function NewsFilter() {
                     <MenuFilter type={teamFilter.type} items={teamFilter.items} currentSelection={currentTeam} setCurrentSelection={setCurrentTeam}/>
                 </Grid>
             </Grid >
-            <Divider sx={{ my: 2 }} />
-
         </>
     )
 }

@@ -21,9 +21,9 @@ import SportsSoccer from '@mui/icons-material/SportsSoccer';
 
 const links = [
     { name: 'home', label: 'Home', href: '/', icon: Home, sections: ['about', 'features', 'background']},
-    { name: 'sports&news', label: 'Sports & News', href: '/sports-news', icon: SportsSoccer, sections: ['news', 'sports']},
-    { name: 'learn', label: 'Learn', href: '/learn', icon: School, sections: ['tutorials', 'courses', 'resources']},
-    { name: 'practice', label: 'Practice', href: '/practice', icon: LocalActivity, sections: ['lounge', 'tutorial']},
+    { name: 'sports-news', label: 'Sports News', href: '/sports-news', icon: SportsSoccer, sections: ['news', 'sports']},
+    { name: 'learn', label: 'Learning Academy', href: '/learn', icon: School, sections: ['tutorials', 'courses', 'resources']},
+    { name: 'practice', label: 'Practice Lounge', href: '/practice', icon: LocalActivity, sections: ['lounge', 'tutorial']},
 ]
 
 export default function TopBarNav() {
@@ -39,8 +39,8 @@ export default function TopBarNav() {
             >
                 <Container maxWidth="lg">
                     {/* 
-                        Paper component is used to create a shadow effect on the AppBar
-                        elevation={5} creates a shadow effect of magnitude 5 out of 24, higher the number, "deeper" the shadow
+                        Paper component is used to create a shadow effect on the AppBar.
+                        elevation={5} creates a shadow effect of magnitude 5 out of 24, higher the number, "deeper" the shadow.
                         color: 'white' as navlinks text color is inheritted 
                     */}
                     <Paper elevation={5} sx={{ borderRadius: '1000px', color: 'white' }}> 
@@ -56,6 +56,7 @@ export default function TopBarNav() {
                             id="app-toolbar"
                         >
                             <TopBarLeftSide />
+                            {/* Below commented out is the profile icon with accompanying items */}
                             {/* <TopBarRightSide/> */}
                         </Toolbar>
                     </Paper>

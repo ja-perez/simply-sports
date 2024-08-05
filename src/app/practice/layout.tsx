@@ -10,7 +10,9 @@ export default function Layout({
     return (
         <main>
             <TopBarNav />
-            <Container maxWidth="lg" id="practice-container"
+            <Container 
+                maxWidth="lg" 
+                id="practice-container"
                 sx={{
                     display: 'flex',
                     justifyContent: 'center',
