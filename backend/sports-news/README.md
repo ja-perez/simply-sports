@@ -68,3 +68,33 @@ method doesn't include the entire list of articles, only about 3 or 5. When I in
 there so I believe its because only those 3 or 5 are generated first while the rest are delayed. It is a really long list so I could
 see that being the case, but some quick google searching make me believe I might have to use the stream option in requests, but again
 I'm not too sure at this point.
+
+08/06/24
+Previously I mentioned that I intended to collect news articles from ESPN using the webscraper, but I immediately found out that isn't
+possible anymore as any "robotic" call gets a 403 error, which indicates that the request was recieved and correct but not accepted.
+So after some digging I came across multiple github repos and general discussion posts about ESPNs hidden apis, one of which contains
+news information, so that was the new approach I had to take.
+
+Implementing the news-by-api script was miles easier than the webscraping script, of course because all of the data I collect is formatted
+and "consistent" with the assumption that it be used for the exact purpose that I am using it. So it really just turned into a process
+where I can just turn the response into a json object and extract/copy what I needed to my own object where I can ultimately save it into
+a file.
+
+I did realize I may run into a problem later with how I'm organizing all the data, in that I have a directory that starts with the website
+name, then goes into the sports, which is then filled with json files for that sports respective leagues. It's not really a problem, more of
+a question if the way I organize the files will become a problem given a certain number of websites or sports. Essentially I'm wondering
+if it would be better to have sports as the root directory and then websites, or keep it the way I have it which is the opposite. Granted
+the reason I have it the way I do is because thats the way I organized it in the news-apis.json file, where the first property is websites,
+then sports, and finally the rest of the stuff I need to create the api urls.
+
+When I imagine how the news page is going to look, I figured each sport would have its own page with the news articles and the website that they
+were pulled from, filling a horizontal div or container. So in this case, when designing the logic for how to pull the data, it would be easier
+if I had all of the soccer articles in one place, with each website containing its respective leagues articles.
+
+Technically this shouldn't really matter as I intend to move all of the data to a database, where querying for a specific type of data should
+be relatively simple. But, if its the case that thats only really possible with the right schema, then I'll need to keep that in mind when
+creating and designing the database calls.
+
+With that being said, now that I have a sizable amount of data collected, I should be good to start working on a script for uploading the
+data to a database. After that, I'll be able to move back to the front end and work on a design for making all of the different articles
+look good.
