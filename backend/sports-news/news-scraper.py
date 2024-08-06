@@ -75,10 +75,27 @@ def write_to_file(file_path, data):
     with open(file_path, "w", encoding='utf-8') as file:
         file.write(str(data))
 
-def output_url_data(urls):
+def write_list_to_file(file_path, data):
+    with open(file_path, "w", encoding='utf-8') as file:
+        for item in data:
+            file.write(str(item) + "\n")
+
+def get_ul_in_soup(urls):
+    ul_list = []
     for url in urls:
         url_path = urls[url][0]
         div_id = urls[url][1]
+        page = requests.get(url)
+        soup = BeautifulSoup(page.content, "html.parser")
+
+        ul_in_body = soup.find("div", id=div_id)
+        ul_url_path = url_path.replace("responses", "data")
+        ul_list.append(ul_in_body)
+    return ul_list
+
+def save_raw_page(urls):
+    for url in urls:
+        url_path = urls[url][0]
         page = requests.get(url)
         soup = BeautifulSoup(page.content, "html.parser")
         body = soup.find("body")
@@ -86,10 +103,18 @@ def output_url_data(urls):
         # write page html to file
         write_to_file(url_path, body.prettify())
 
-        # find ul with news articles by div id
-        ul_in_body = soup.find("div", id=div_id)
-        ul_url_path = url_path.replace("responses", "data")
-        write_to_file(ul_url_path, ul_in_body.prettify())
+def process_li_items(li_list):
+    item_pairs = []
+    for li in li_list:
+        img = li.find("img")
+        a_tag = li.find("a")
+        if img is None or a_tag is None:
+            continue
+        if len(li.find_all("a")) > 1:
+            a_tag = li.find("a", class_="stream-title")
+        combine = BeautifulSoup(str(img) + str(a_tag), "html.parser")
+        item_pairs.append(combine)
+    return item_pairs
 
 def main():
     # Load website data and urls from news-urls.json
@@ -112,7 +137,30 @@ def main():
                 urls[url] = [os.path.join("backend", "sports-news", "responses", site + "-" + sport_t + "-" + link_t + ".html"),
                              div_id]
 
-    output_url_data(urls)
+    # save_raw_page(urls)
+
+    li_pairs = []
+    for i, ul in enumerate(get_ul_in_soup(urls)):
+        li_list = ul.find_all("li")
+        li_items = process_li_items(li_list)
+        li_items_path = os.path.join("backend", "sports-news", "data", str(i) + "_li_pairs.html")
+        write_list_to_file(li_items_path, li_items)
+        li_pairs.append(li_items)
+
+    content_pairs = []
+    for li_pair in li_pairs:
+        for li_content in li_pair:
+            img = li_content.find("img")
+            a_tag = li_content.find("a")
+            if img is None or a_tag is None:
+                continue
+            img_src = img.get("src")
+            a_tag_href = a_tag.get("href")
+            a_tag_text = a_tag.get_text()
+            pair = img_src + "\n" + a_tag_href + "\n" + a_tag_text
+            content_pairs.append(pair)
+    pair_path = os.path.join("backend", "sports-news", "data", "content_pairs.html")
+    write_list_to_file(pair_path, content_pairs)
 
 if __name__ == "__main__":
-    main()
+     main()
