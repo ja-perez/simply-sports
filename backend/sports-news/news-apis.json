@@ -13,12 +13,12 @@
                 "bundesliga": "ger.1",
                 "ligue-1": "fra.1",
                 "mls": "usa.1",
-                "uefa-champions-league": "uefa.1",
-                "europa-league": "uefa.2",
-                "copa-libertadores": "conmebol.1",
-                "copa-sudamericana": "conmebol.2",
-                "copa-america": "conmebol.3",
-                "fifa-world-cup": "fifa.1"
+                "uefa-champions-league": "uefa.champions",
+                "europa-league": "uefa.europa",
+                "copa-libertadores": "conmebol.libertadores",
+                "copa-sudamericana": "conmebol.sudamericana",
+                "copa-america": "conmebol.america",
+                "fifa-world-cup": "fifa.world"
             }
         },
         "football": {
