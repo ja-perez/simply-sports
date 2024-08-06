@@ -1,0 +1,37 @@
+{
+    "espn": {
+        "soccer": {
+            "apis": {
+                "news": "http://site.api.espn.com/apis/site/v2/sports/soccer/~league~/news",
+                "scores": "http://site.api.espn.com/apis/site/v2/sports/soccer/~league~/scoreboard",
+                "teaminfo": "http://site.api.espn.com/apis/site/v2/sports/soccer/~league~/teams"
+            },
+            "league-ids": {
+                "premier-league": "eng.1",
+                "la-liga": "esp.1",
+                "serie-a": "ita.1",
+                "bundesliga": "ger.1",
+                "ligue-1": "fra.1",
+                "mls": "usa.1",
+                "uefa-champions-league": "uefa.1",
+                "europa-league": "uefa.2",
+                "copa-libertadores": "conmebol.1",
+                "copa-sudamericana": "conmebol.2",
+                "copa-america": "conmebol.3",
+                "fifa-world-cup": "fifa.1"
+            }
+        },
+        "football": {
+            "apis": {
+                "news": "http://site.api.espn.com/apis/site/v2/sports/football/~league~/news",
+                "scores": "http://site.api.espn.com/apis/site/v2/sports/football/~league~/scoreboard",
+                "all-teams-info": "http://site.api.espn.com/apis/site/v2/sports/football/~league~/teams",
+                "specific-team-info": "http://site.api.espn.com/apis/site/v2/sports/football/~league~/teams/~team~"
+            },
+            "league-ids": {
+                "nfl": "nfl",
+                "college-football": "college-football"
+            }
+        }
+    }
+}
