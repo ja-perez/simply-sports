@@ -43,3 +43,28 @@ whatever other pattern I can find.
 The alternative to all of this of course, is to simply go through each webpage with relevant articles and
 copying and pasting the id of the lists parent div. I'm not too sure if those ids are generated randomly or
 if Yahoo uses an actual naming convention, but because its an id I'm inclined to believe its not something that gets changed.
+
+08/05/24
+I decided to move forward and just settle with using the div id's. I did test out the first method for solving
+the multiple "ul" tag issue and found that in my two test cases, there were actually multiple tags in both
+with one appearing first and the other second... so again I've settled with just using div id's.
+
+In processing the actual list items I thought I'd be able to just extract the first img and a tags that I found
+but in some articles, the img itself is wrapped in an a tag, so I just added a quick check to see if there are multiple
+a tags, and if so then extract the one with a specific class name. Not ideal and will require an additional property in
+the url json file for each url for an a tag identifier in the case of conflicts.
+
+Overall though, extracting the img source, a tag text and href was relatively straightforward. I know have a text file full
+of news article metadata.
+
+Next step would be to clean up the code and either remove all the preliminary testing and logging or refactor it and move it
+into some kind of testing module. I'll also have to start looking for more websites with sports articles and see if my current
+process holds up for them as well. I've already considered ESPN but I found a leetcode post saying that its content is dynamically
+generated so I might have to use something called selenium, or make calls directly to the api. I'm not sure yet if that applies to
+the news articles that I plan to scrape but we will see when I get there.
+
+I actually already ran into a similar problem with the Yahoo Premier League website, in that the page the is returned by the request
+method doesn't include the entire list of articles, only about 3 or 5. When I inspect the page directly the DOM tree has all of them
+there so I believe its because only those 3 or 5 are generated first while the rest are delayed. It is a really long list so I could
+see that being the case, but some quick google searching make me believe I might have to use the stream option in requests, but again
+I'm not too sure at this point.
