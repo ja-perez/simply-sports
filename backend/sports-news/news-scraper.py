@@ -4,7 +4,6 @@ from bs4 import BeautifulSoup
 import json
 
 import os
-import re
 
 '''
 Purpose: Automate the process of scraping news articles from multiple websites
