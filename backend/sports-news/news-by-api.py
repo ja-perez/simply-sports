@@ -176,6 +176,8 @@ def main():
                 except KeyError:
                     header = f"{league} News"
                 news_metadata = {
+                    "website": website,
+                    "league": league,
                     "header": header,
                     "source": league_api_url,
                     "lastUpdated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
