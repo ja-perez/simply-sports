@@ -3,12 +3,12 @@ export function Hero() {
         <section>
             <h2>Welcome to SimplySports!</h2>
             <h3>Your one-stop shop for all things sports betting.</h3>
-            <p>
-                <section id="hero-text">
+            <section id="hero-text">
+                <p>
                     Whether you&apos;re a beginner or a pro, we have everything you need to get started and stay ahead of the game.
                     From the latest news and updates to in-depth tutorials and practice sessions, we&apos;ve got you covered. So what are you waiting for? Let&apos;s get started!
-                </section>
-            </p>
+                </p>
+            </section>
         </section>
     );
 }
@@ -17,13 +17,13 @@ export function Features() {
     return (
         <section>
             <h2>Features</h2>
-            <p>
+            <section>
                 <ul>
                     <li>Keep up-to-date with all the major sports stories and news</li>
                     <li>Learn the ropes of sports betting, whether you&apos;re a beginner or a pro the learning never stops</li>
                     <li>Want to test your intuition or build that gut instint, head on over to the practice arena for a simulated betting session</li>
                 </ul>
-            </p>
+            </section>
         </section>
     );
 }
