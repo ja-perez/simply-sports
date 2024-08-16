@@ -1,6 +1,6 @@
 
 import Dashboard from "./dashboard/page";
-import LandingPage from "@/components/practice/landing-page";
+import PracticeLogin from "@/components/practice/practice-login";
 
 import Grid from '@mui/material/Grid';
 import Divider from '@mui/material/Divider';
@@ -31,7 +31,7 @@ export default function Practice() {
             <>
             {/* Main Body */}
             <Grid item xs={12} id="practice-grid-body-item">
-                <LandingPage />
+                <PracticeLogin />
             </Grid>
                 </>
             )

@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Divider from '@mui/material/Divider';
 
-export default function LandingPage() {
+export default function PracticeLogin() {
     return (
         <Grid
             container
