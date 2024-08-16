@@ -20,12 +20,12 @@ export default function Layout({
                     pb: { xs: 8, sm: 12 },
                 }}
                 maxWidth="lg"
-                id="sports-news-container"
+                id="sports-news-and-teams-container"
             >
-                <Grid container spacing={2} id="sports-news-content-grid-container">
+                <Grid container spacing={2} id="sports-news-and-teams-grid-container">
 
                     {/* Main Body */}
-                    <Grid item xs={12} id="sports-news-body-grid-item">
+                    <Grid item xs={12} id="sports-news-and-teams-body-grid-item">
                         {children}
                     </Grid>
                 </Grid>

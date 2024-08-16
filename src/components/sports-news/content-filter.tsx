@@ -1,8 +1,6 @@
 'use client';
 import React from 'react';
-
 import { useSearchParams, usePathname, useRouter } from "next/navigation"
-
 import { 
     Grid, 
     Button, 
@@ -11,8 +9,8 @@ import {
     MenuItem,
     Divider, 
 } from "@mui/material";
-
 import { sportOptions, leagueOptions } from "@/lib/placeholder-data";
+
 
 interface ContentFilterProps {
     sport: string,
