@@ -16,11 +16,11 @@ import {
 
 export async function connectToDatabase() {
     try {
-        if (connection.readyState === 1) {
-            await connect('mongodb://localhost:27017/sports');
+        if (connection.readyState === 0) {
+            await connect('mongodb://localhost:27017/simply_sports');
             console.log('Connected to database');
-        } else {
-            console.log('Already connected to database');
+        } else if (connection.readyState === 1) {
+            console.log('Already connected to database: ', connection.name);
         }
     } catch (err) {
         console.error("Error connecting to the database");
@@ -45,13 +45,13 @@ export async function fetchSports() {
 export async function fetchArticles() {
     try {
         await connectToDatabase();
-        const articlesQuery = articleModel.find({}, { _id: 0, __v: 0 });
+        const articlesQuery = articleModel.find({});
         const articlesData = await articlesQuery.exec();
         const articles: Article[] = articlesData.map((article) => article.toJSON());
         return articles;
     } catch (err) {
         console.error("Error fetching articles");
-        console.error("Error");
+        console.error("Error: ", err);
     }
 }
 
@@ -73,15 +73,21 @@ export async function fetchArticleById(id: string) {
 export async function fetchArticlesBySportLeague(sport: string, league: string) {
     try {
         await connectToDatabase();
-        const articlesQuery = articleModel.find(
-            { 'metadata.sport': sport, 'metadata.league': league }, 
-            { _id: 0, __v: 0, metadata: 0 });
+        console.log(`Fetching articles for sport: ${sport}, league: ${league}`);
+        var articlesQuery = articleModel.find({});
+        if (sport !== "All") {
+            articlesQuery = articlesQuery.find({ sport: sport });
+        }
+        if (league !== "All") {
+            articlesQuery = articlesQuery.find({ league: league });
+        }
         const articlesData = await articlesQuery.exec();
         const articles: Article[] = articlesData.map((article) => article.toJSON());
         return articles;
     } catch (err) {
         console.error("Error fetching articles");
         console.error("Error: ", err);
+        return null;
     }
 
 }
