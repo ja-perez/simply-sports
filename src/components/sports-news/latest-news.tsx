@@ -1,10 +1,8 @@
 import { fetchArticlesBySportLeague} from '@/lib/data';
 import { testArticle } from '@/lib/placeholder-data';
 
-import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Chip from '@mui/material/Chip';
-
 import Link from 'next/link';
 
 interface LatestNewsProps {
