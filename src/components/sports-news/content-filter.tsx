@@ -19,9 +19,6 @@ interface ContentFilterProps {
 export default function ContentFilter({
     sport,
 }: ContentFilterProps) {
-    console.log(sport);
-    console.log(leagueOptions);
-    console.log(leagueOptions[sport]);
     return (
         <Grid container spacing={2} id="news-filter-grid-container" >
             <Grid item xs={6} id="sport-filter-grid-item" sx={{ display:'flex', justifyContent:'center'}}>
@@ -61,10 +58,9 @@ function MenuFilter({
 
     function handleSelection(key:string, value: string) {
         const params = new URLSearchParams(searchParams);
-        if (value) {
-            params.set(key, value);
-        } else {
-            params.delete(key);
+        params.set(key, value);
+        if (key === "sport") {
+            params.set("league", "All");
         }
         replace(`${pathname}?${params.toString()}`);
     }
