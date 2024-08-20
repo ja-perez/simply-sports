@@ -78,7 +78,7 @@ function MenuFilter({
                 <Typography variant="body1" >{label}</Typography>
                 <Divider orientation="vertical" flexItem sx={{mx:2}}/>
                 {/* <currentSelection.icon /> */}
-                {searchParams.get(paramKey) || "All"}
+                <Typography variant="body1" >{searchParams.get(paramKey) || "All"}</Typography>
             </Button>
             <Menu
                 id="basic-menu"
