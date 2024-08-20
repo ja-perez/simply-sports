@@ -83,6 +83,7 @@ export async function fetchArticlesBySportLeague(sport: string, league: string) 
         }
         const articlesData = await articlesQuery.exec();
         const articles: Article[] = articlesData.map((article) => article.toJSON());
+        console.log(`Fetched ${articles.length} articles`);
         return articles;
     } catch (err) {
         console.error("Error fetching articles");

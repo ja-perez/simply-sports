@@ -41,4 +41,24 @@ const leagueOptions: Options = {
     ],
 }
 
-export { sportOptions, leagueOptions }
+import { Article } from "./definitions";
+const testArticle: Article = {
+    id: "1",
+    title: "Test Article",
+    description: "This is a test article",
+    image: {
+        href: "https://via.placeholder.com/100",
+        alt: "Placeholder image",
+        width: 100,
+        height: 100,
+    },
+    href: "https://example.com",
+    metadata: {
+        site: "Test Site",
+        sport: "Soccer",
+        league: "Premier League",
+        date: new Date(),
+    }
+}
+
+export { sportOptions, leagueOptions, testArticle }
