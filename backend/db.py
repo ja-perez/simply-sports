@@ -1,48 +1,26 @@
-from pymongo import MongoClient
+from pymongo import MongoClient, TEXT
+import pprint
 from dotenv import dotenv_values
 
 import datetime
 import os
 import json
 
-class Article:
-    def __init__(self, props: dict):
-        self.validate_props(props)
-        self.id = props["id"]
-        self.title = props["title"]
-        self.url = props["url"]
-        self.date = datetime.datetime.fromisoformat(props["date"])
-        self.metadata = props["metadata"]
-        self.media = props["media"]
+from news_articles.guardian.api import GuardianAPI
 
-    @staticmethod
-    def validate_props(props):
-        required_props = [
-            "id", 
-            "title", 
-            "url", 
-            "date", 
-            "metadata",
-            "media"
-            ]
-        for prop in required_props:
-            if prop not in props:
-                raise ValueError(f"Article is missing required property: {prop}")
 
-    def to_dict(self):
-        return self.props
-
-    def to_json(self):
-        return json.dumps(self.to_dict())
+def insert_articles(collection, articles: list):
+    for article in articles:
+        collection.insert_one(article.to_dict())
 
 
 def main():
     config = dotenv_values(".env")
     env_mode = config["MODE"]
-    db_name = config["DB_NAME"]
+    db_name = config["MONGO_NAME"]
     if (env_mode == "prod"):
-        db_user, db_password = config["DB_USER"], config["DB_PASSWORD"]
-        db_host = config["DB_HOST"]
+        db_user, db_password = config["MONGO_USER"], config["MONGO_PASSWORD"]
+        db_host = config["MONGO_HOST"]
         db_uri = f"mongodb+srv://{db_user}:{db_password}@{db_host}:27017/{db_name}?authSource=admin"
     else:
         db_uri = "mongodb://localhost:27017/"
@@ -50,13 +28,44 @@ def main():
     client = MongoClient(db_uri)
     db = client[db_name]
     collection = db["articles"]
+    info = collection.index_information()
+    index_pairs = [info[key]['key'][0] for key in info]
+    index_names = [name for name, _ in index_pairs]
+    if 'article_id' not in index_names:
+        collection.create_index([("article_id")], unique=True)
 
     # Get newest article date from each unique source in database
+    query = collection.aggregate([
+        { "$group": {
+                "_id": "$metadata.site",
+                "newest_date": {"$max": "$metadata.date"}
+            },
+        },
+    ])
+    most_recent_article_per_source = { 
+        pair['_id']: pair['newest_date'].date() for pair in query
+    }
 
-    # Get articles somehow here somehow
 
-    # Insert articles into MongoDB here
+    # Guardian API
+    cwd = os.getcwd() if "backend" in os.getcwd() else os.path.join(os.getcwd(), "backend")
+    guardian_folder_path = os.path.join(cwd, "news_articles", "guardian")
+    guardian_api_data_path = os.path.join(guardian_folder_path, "api.data.json")
+    guardian = GuardianAPI(
+        previous_fetch_date=most_recent_article_per_source['The Guardian'],
+        api_data_path=guardian_api_data_path)
+    sports = guardian.collect_api_data()
 
+    for sport in sports:
+        leagues = sports[sport] 
+        for league in leagues:
+            articles = leagues[league]
+            for article_data in articles:
+                article = guardian.format_article(
+                    sport, 
+                    league,
+                    article_data)
+                collection.insert_one(article)
 
 
 if __name__ == "__main__":

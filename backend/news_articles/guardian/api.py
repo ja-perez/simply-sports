@@ -5,44 +5,129 @@ from os import path, getcwd
 
 
 class GuardianAPI:
-    def __init__(self, api_key: str):
+    def __init__(self, 
+                 previous_fetch_date: datetime.datetime = None, 
+                 api_key: str = "test", 
+                 api_data_path: str = "api.data.json"):
         self.api_key = api_key
+        self.api_data = self.read_api_data(api_data_path)
+        if not previous_fetch_date:
+            self.previous_fetch_date = datetime.datetime.now()
+        else:
+            self.previous_fetch_date = previous_fetch_date
         self.base_content_url = "https://content.guardianapis.com/search"
 
     def requestContent(self, query: str="", params: dict={}) -> dict:
-        search = { **params, "api_key": self.api_key }
+        search = { "api-key": self.api_key, **params,  }
         if query:
             search["q"] = query
         res = requests.get(self.base_content_url, params=search)
+        if (res.status_code != 200):
+            print(res, res.json())
+            print("Request params:",search)
+            return
         data = res.json()
         data["response"]["dateFetched"] = datetime.datetime.now().isoformat()
         return data
+    
+    def collect_api_data(self):
+        articles = {} 
+        current_date = datetime.datetime.now().date()
+        if current_date <= self.previous_fetch_date:
+            return articles
+        for sport in self.api_data:
+            sport_data = self.api_data[sport]
+            articles = {**articles, **self.collect_sport_articles(sport_data)}
+        return articles
 
-def write_data_to_file(file_path: str, data: dict):
-    with open(file_path, "w") as file:
-        json.dump(data, file, indent=4, sort_keys=True)
+    def collect_sport_articles(self, sport_data: dict) -> dict:
+        title = sport_data["title"]
+        section = sport_data["section"]
+        leagues = sport_data["leagues"]
+        articles = { title: {} }
 
-def read_data_from_file(file_path) -> dict:
-    if (path.exists(file_path)):
-        return json.loads(open(file_path))
+        current_date = datetime.datetime.now()
+        for league in leagues:
+            league_tag = section + "/" + leagues[league]
+            params = {
+                "type": "article",
+                "section": section,
+                "show-elements": "image",
+                "show-tags": "keyword",
+                "tag": league_tag,
+                "page-size": 50,
+                "from-date": self.previous_fetch_date.isoformat(),
+                "to-date": current_date.isoformat()
+            }
+            response = self.requestContent(params=params)
+            if response is None:
+                break
+            count = min(response["response"]["total"], response["response"]["pageSize"])
+            articles[title][league] = response["response"]["results"]
+            print("Fetched", count, "articles for", title, league)
+        return articles
 
-def append_data_to_file(file_path: str, data: dict):
-    if (path.isfile(file_path)):
-        file_data = read_data_from_file(file_path)
-        if file_data:
-            file_data.extend(data)
+    def append_data_to_file(self, file_path: str, data: dict):
+        if (path.isfile(file_path)):
+            file_data = self.read_data_from_file(file_path)
+            if file_data:
+                file_data.extend(data)
+            else:
+                file_data = data
         else:
             file_data = data
-    else:
-        file_data = data
-    with open(file_path, "a") as file:
-        json.dump(file_data, file, indent=4, sort_keys=True)
+        with open(file_path, "a") as file:
+            json.dump(file_data, file, indent=4, sort_keys=True)
 
-def read_api_data(file_path: str) -> dict:
-    if (path.exists(file_path)):
-        return json.loads(open(file_path, "r").read())
 
-def collect_sport_articles(guardian: GuardianAPI, sport_data: dict):
+    @staticmethod
+    def format_article(sport: str, league: str, article_data: dict) -> dict:
+        date = article_data["webPublicationDate"]
+        article = {
+            "article_id": article_data["id"],
+            "href": article_data["apiUrl"],
+            "title": article_data["webTitle"],
+            "metadata": {
+                "sport": sport,
+                "league": league,
+                "site": "The Guardian",
+                "date": datetime.datetime.fromisoformat(date),
+                "tags": article_data["tags"]
+            },
+            "media": [
+                {
+                    elem["relation"] : [
+                        {
+                            "url": asset["file"],
+                            "alt": asset["typeData"]["altText"],
+                            "height": int(asset["typeData"]["height"]),
+                            "width": int(asset["typeData"]["width"]),
+                            "credit": asset["typeData"]["credit"],
+                            "source": asset["typeData"]["source"],
+                        } for asset in elem["assets"]
+                    ]
+                } for elem in article_data["elements"]
+            ]
+        }
+        return article
+
+    @staticmethod
+    def write_data_to_file(file_path: str, data: dict):
+        with open(file_path, "w") as file:
+            json.dump(data, file, indent=4, sort_keys=True)
+
+    @staticmethod
+    def read_data_from_file(file_path) -> dict:
+        if (path.exists(file_path)):
+            return json.loads(open(file_path, "r").read())
+
+    @staticmethod
+    def read_api_data(file_path: str) -> dict:
+        if (path.exists(file_path)):
+            return json.loads(open(file_path, "r").read())
+
+
+def collect_sport_articles(guardian: GuardianAPI, sport_data: dict, from_dateisoformat: str) -> dict:
     title = sport_data["title"]
     section = sport_data["section"]
     leagues = sport_data["leagues"]
@@ -59,7 +144,7 @@ def collect_sport_articles(guardian: GuardianAPI, sport_data: dict):
             "show-tags": "keyword",
             "tag": league_tag,
             "page-size": 50,
-            "from-date": start_of_year.isoformat(),
+            "from-date": from_dateisoformat(),
             "to-date": current_date.isoformat()
         }
         response = guardian.requestContent(params=params)
@@ -71,15 +156,15 @@ def collect_sport_articles(guardian: GuardianAPI, sport_data: dict):
 def collect_api_data(api_data: dict, guardian: GuardianAPI):
     articles = {}
     for sport in api_data:
-        articles.extend(collect_sport_articles(guardian, api_data[sport]))
+        sport_data = api_data[sport]
+        articles[sport] = guardian.collect_sport_articles(sport_data)
     return articles
-
 
 def main():
     api_key = "test"
     guardian = GuardianAPI(api_key)
     api_data_file = path.join(getcwd(), "backend", "news_articles", "guardian", "api.data.json")
-    api_data = read_api_data(api_data_file)
+    api_data = guardian.read_api_data(api_data_file)
     data_output_file = path.join(getcwd(), "data", "guardian_articles.json")
 
 
