@@ -1,0 +1,25 @@
+{
+    "soccer": {
+        "title": "Soccer",
+        "section": "football",
+        "leagues": {
+            "premier-league": "premierleague",
+            "la-liga": "laligafootball",
+            "mls": "mls"
+        }
+    },
+    "american-football": {
+        "title": "Football",
+        "section": "sport",
+        "leagues": {
+            "nfl": "nfl"
+        }
+    },
+    "baseball": {
+        "title": "Baseball",
+        "section": "sport",
+        "leagues": {
+            "mlb": "mlb"
+        }
+    }
+}

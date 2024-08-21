@@ -31,7 +31,7 @@ def fetch_articles(query=None, from_date=None, to_date=None, write_to_file=False
     data = res.json()
     data["response"]["dateFetched"] = datetime.datetime.now().isoformat()
     if write_to_file:
-        write_data_to_file(path.join(CWD, "guardian_data.json"), data)
+        utils.write_data_to_file(path.join(CWD, "guardian_data.json"), data)
     return data
 
 def get_new_articles() -> dict:
