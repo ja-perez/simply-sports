@@ -36,10 +36,12 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# python venv
+# python
+backend/*/__pycache__/
 backend/venv/
 .venv/
 
-# backend logging files
-backend/sports-news/data/*
-backend/sports-news/responses/*
+# backend archive and data output
+backend/news_articles/archive/data/*
+backend/news_articles/archive/responses/*
+data/
