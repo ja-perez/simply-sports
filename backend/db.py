@@ -1,12 +1,11 @@
 from pymongo import MongoClient, TEXT
-import pprint
 from dotenv import dotenv_values
 
 import datetime
 import os
-import json
 
 from news_articles.guardian.api import GuardianAPI
+from news_articles.espn.api import ESPNAPI
 
 
 def insert_articles(collection, articles: list):
@@ -28,31 +27,18 @@ def main():
     client = MongoClient(db_uri)
     db = client[db_name]
     collection = db["articles"]
-    info = collection.index_information()
-    index_pairs = [info[key]['key'][0] for key in info]
-    index_names = [name for name, _ in index_pairs]
-    if 'article_id' not in index_names:
-        collection.create_index([("article_id")], unique=True)
-
-    # Get newest article date from each unique source in database
-    query = collection.aggregate([
-        { "$group": {
-                "_id": "$metadata.site",
-                "newest_date": {"$max": "$metadata.date"}
-            },
-        },
-    ])
-    most_recent_article_per_source = { 
-        pair['_id']: pair['newest_date'].date() for pair in query
-    }
-
 
     # Guardian API
-    cwd = os.getcwd() if "backend" in os.getcwd() else os.path.join(os.getcwd(), "backend")
-    guardian_folder_path = os.path.join(cwd, "news_articles", "guardian")
+    cwd = os.getcwd()
+    if "backend" not in cwd:
+        cwd = os.path.join(cwd, "backend", "news_articles")
+    elif "news_articles" not in cwd:
+        cwd = os.path.join(cwd, "news_articles")
+    guardian_folder_path = os.path.join(cwd, "guardian")
     guardian_api_data_path = os.path.join(guardian_folder_path, "api.data.json")
+    current_date = datetime.datetime.now()
     guardian = GuardianAPI(
-        previous_fetch_date=most_recent_article_per_source['The Guardian'],
+        previous_fetch_date=current_date,
         api_data_path=guardian_api_data_path)
     sports = guardian.collect_api_data()
 
@@ -65,8 +51,25 @@ def main():
                     sport, 
                     league,
                     article_data)
+                if collection.find_one({"article_id": article["article_id"]}):
+                    continue
                 collection.insert_one(article)
 
+    # ESPN API
+    espn_folder_path = os.path.join(cwd, "espn")
+    espn_api_data_path = os.path.join(espn_folder_path, "api.data.json")
+    espn = ESPNAPI(espn_api_data_path)
+
+    api_data = espn.collect_api_data()
+    articles = espn.process_articles(api_data)
+    output_file_path = os.path.join(espn_folder_path, "articles.json")
+    espn.write_data_to_file(output_file_path, articles)
+    # upload articles
+    for index in articles:
+        article = articles[index]
+        if collection.find_one({"article_id": article["article_id"]}):
+            continue
+        collection.insert_one(article)
 
 if __name__ == "__main__":
     main()

@@ -32,8 +32,10 @@ class GuardianAPI:
     
     def collect_api_data(self):
         articles = {} 
-        current_date = datetime.datetime.now().date()
-        if current_date <= self.previous_fetch_date:
+        current_date = datetime.datetime.now()
+        if current_date.date() <= self.previous_fetch_date.date():
+            print("No Guardian data collected: Not enough time has elapsed since last fetch")
+            print("Last fetch date:", self.previous_fetch_date)
             return articles
         for sport in self.api_data:
             sport_data = self.api_data[sport]
@@ -83,6 +85,7 @@ class GuardianAPI:
     @staticmethod
     def format_article(sport: str, league: str, article_data: dict) -> dict:
         date = article_data["webPublicationDate"]
+        formatted_date = datetime.datetime.fromisoformat(date)
         article = {
             "article_id": article_data["id"],
             "href": article_data["apiUrl"],
@@ -91,7 +94,7 @@ class GuardianAPI:
                 "sport": sport,
                 "league": league,
                 "site": "The Guardian",
-                "date": datetime.datetime.fromisoformat(date),
+                "date": formatted_date.isoformat(),
                 "tags": article_data["tags"]
             },
             "media": [
@@ -162,9 +165,9 @@ def collect_api_data(api_data: dict, guardian: GuardianAPI):
 
 def main():
     api_key = "test"
-    guardian = GuardianAPI(api_key)
-    api_data_file = path.join(getcwd(), "backend", "news_articles", "guardian", "api.data.json")
-    api_data = guardian.read_api_data(api_data_file)
+    api_data_path = path.join(getcwd(), "backend", "news_articles", "guardian", "api.data.json")
+    guardian = GuardianAPI(api_key=api_key, api_data_path=api_data_path)
+    api_data = guardian.read_api_data(api_data_path)
     data_output_file = path.join(getcwd(), "data", "guardian_articles.json")
 
 
