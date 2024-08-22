@@ -37,8 +37,9 @@ def main():
     guardian_folder_path = os.path.join(cwd, "guardian")
     guardian_api_data_path = os.path.join(guardian_folder_path, "api.data.json")
     current_date = datetime.datetime.now()
+    start_of_year = datetime.datetime(current_date.year, 1, 1)
     guardian = GuardianAPI(
-        previous_fetch_date=current_date,
+        previous_fetch_date=start_of_year,
         api_data_path=guardian_api_data_path)
     sports = guardian.collect_api_data()
 
@@ -47,6 +48,9 @@ def main():
         for league in leagues:
             articles = leagues[league]
             for article_data in articles:
+                images = [1 if elem["type"] == "image" else 0 for elem in article_data["elements"]]
+                if 1 not in images:
+                    continue
                 article = guardian.format_article(
                     sport, 
                     league,

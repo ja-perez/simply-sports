@@ -88,14 +88,16 @@ class GuardianAPI:
         formatted_date = datetime.datetime.fromisoformat(date)
         article = {
             "article_id": article_data["id"],
-            "href": article_data["apiUrl"],
+            "href": article_data["webUrl"],
             "title": article_data["webTitle"],
             "metadata": {
                 "sport": sport,
                 "league": league,
                 "site": "The Guardian",
                 "date": formatted_date.isoformat(),
-                "tags": article_data["tags"]
+                "tags": {
+                    tag["id"]: tag for tag in article_data["tags"]
+                }
             },
             "media": [
                 {
