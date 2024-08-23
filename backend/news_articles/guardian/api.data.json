@@ -1,25 +1,43 @@
 {
-    "soccer": {
-        "title": "Soccer",
-        "section": "football",
-        "leagues": {
-            "premier-league": "premierleague",
-            "la-liga": "laligafootball",
-            "mls": "mls"
-        }
-    },
-    "american-football": {
-        "title": "Football",
-        "section": "sport",
-        "leagues": {
-            "nfl": "nfl"
-        }
-    },
-    "baseball": {
-        "title": "Baseball",
-        "section": "sport",
-        "leagues": {
-            "mlb": "mlb"
+    "prevFetchDate": "2024-08-23T01:57:39.330227",
+    "sports": {
+        "baseball": {
+            "leagues": {
+                "mlb": {
+                    "title": "MLB",
+                    "value": "mlb"
+                }
+            },
+            "section": "sport",
+            "title": "Baseball"
+        },
+        "football": {
+            "leagues": {
+                "nfl": {
+                    "title": "NFL",
+                    "value": "nfl"
+                }
+            },
+            "section": "sport",
+            "title": "Football"
+        },
+        "soccer": {
+            "leagues": {
+                "la-liga": {
+                    "title": "La Liga",
+                    "value": "laligafootball"
+                },
+                "mls": {
+                    "title": "MLS",
+                    "value": "mls"
+                },
+                "premier-league": {
+                    "title": "Premier League",
+                    "value": "premierleague"
+                }
+            },
+            "section": "football",
+            "title": "Soccer"
         }
     }
 }
