@@ -6,133 +6,126 @@ from os import path, getcwd
 class ESPNAPI:
     def __init__(self, 
                 api_data_path: str = "api.data.json") -> None:
-        self.api_data_path = api_data_path
-        self.api_data = self.read_api_data(self.api_data_path)
+        self.api_data_path: str = api_data_path
+        self.api_data = self.read_api_data()
+        self.previous_fetch_date: datetime.datetime = self.get_fetch_date()
 
-    def update_fetch_date(self) -> None:
-        with open(self.api_data_path, 'w') as file:
-            self.api_data["prevFetchDate"] = datetime.datetime.now().isoformat()
-            json.dump(self.api_data, file, indent=4, sort_keys=True)
+    def read_api_data(self) -> dict:
+        if not path.exists(self.api_data_path):
+            return {}
+        with open(self.api_data_path, 'r') as file:
+            return json.load(file)
 
-    def get_sports_map(self) -> dict:
-        if "sports" in self.api_data:
-            return self.api_data["sports"]
-        return {}
-
-    @staticmethod
-    def get_news_urls(sport: str, league: str) -> str:
-        return f"https://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/news"
-
-    def request_content(self, request_url: str) -> dict:
-        res = requests.get(request_url)
-        if res.status_code != 200:
-            print(res, res.json())
-            print("Request URL:", request_url)
-            return None
-        data = res.json()
-        self.update_fetch_date()
-        return data
-
-    def enough_elapsed_time(self) -> bool:
-        if "prevFetchDate" not in self.api_data:
-            prev_fetch_date = datetime.datetime.now()
-            self.update_fetch_date()
-            return True
-        else:
-            prev_fetch_date = datetime.datetime.fromisoformat(self.api_data["prevFetchDate"])
-        
+    def fetch_sports_content(self) -> dict:
+        previous_fetch_date = self.previous_fetch_date
         current_date = datetime.datetime.now()
-        elapsed_time = current_date - prev_fetch_date
-        return elapsed_time.days >= 1
-
-    def collect_api_data(self):
-        if not self.enough_elapsed_time():
+        if not self.has_day_passed(previous_fetch_date, current_date):
             print("No ESPN data collected: Not enough time has elapsed since last fetch")
             print("Last fetch date:", self.api_data["prevFetchDate"])
             return {}
 
-        sports = self.get_sports_map()
-        articles = {}
+        content = {}
+        sports = self.api_data.get("sports", {})
         for sport in sports:
             sport_data = sports[sport]
-            articles = {**articles, **self.collect_sport_articles(sport_data)}
-        return articles
+            content[sport] = {}
+            leagues = sport_data.get("leagues", {})
+            for league in leagues:
+                league_id = leagues[league].get("value")
+                news_url = self.get_news_url(sport, league_id)
+                data = self.get_content(url=news_url)
+                content[sport][league] = data.get("articles", [])
+                print(f"Fetched {len(content[sport][league])} articles for {sport} {league}")
+        self.update_fetch_date()
+        return content
 
-    def collect_sport_articles(self, sport_data: dict) -> dict:
-        title = sport_data["title"]
-        sport = sport_data["sport"]
-        leagues = sport_data["leagues"]
-        articles = { title: {} }
+    def process_sports_content(self, content: dict) -> dict:
+        processed_content = {}
+        for sport in content:
+            sport_data = content[sport]
+            processed_content[sport] = {}
+            for league in sport_data:
+                articles = sport_data[league]
+                processed_content[sport][league] = self.process_sport_articles(articles)
+                updated_articles = []
+                for article in processed_content[sport][league]:
+                    article["metadata"]["sport"] = sport
+                    article["metadata"]["league"] = league
+                    updated_articles.append(article)
+                processed_content[sport][league] = updated_articles
+        return processed_content
 
-        for league in leagues:
-            request_url = self.get_news_urls(sport, leagues[league])
-            response = self.request_content(request_url)
-            if response is None:
-                break
-            articles[title][league] = response["articles"]
-            count = len(articles[title][league])
-            print(f"Fetched {count} articles for {title} {league}")
-        return articles
-        
-    @staticmethod
-    def read_api_data(file_path: str) -> dict:
-        if not path.exists(file_path):
-            return {}
-        with open(file_path, 'r') as file:
-            return json.load(file)
+    def process_sport_articles(self, articles: list) -> list:
+        processed_articles = []
+        for article in articles:
+            # Filtering
+            # Formatting
+            processed_article = self.format_article(article)
+            # Append to list
+            processed_articles.append(processed_article)
+        return processed_articles
 
-    @staticmethod
-    def format_article(sport, league, article_data):
-        date = datetime.datetime.fromisoformat(article_data["published"])
-        main_props = {
+    def format_article(self, article_data: dict) -> dict:
+        content = {
             "article_id": article_data["links"]["web"]["href"],
-            "href": article_data["links"]["web"]["href"],
             "title": article_data["headline"],
+            "href": article_data["links"]["web"]["href"],
         }
         metadata = {
-            "sport": sport,
-            "league": league,
             "site": "ESPN",
-            "date": date.isoformat(),
-            "categories": article_data["categories"],
-            "premium": article_data["premium"],
-            "type": article_data["type"],
+            "date": article_data["published"],
+            "categories": [cat for cat in article_data.get("categories", []) if cat.get("type") != "guid"],
+            "premium": article_data.get("premium"),
+            "type": article_data.get("type"),
         }
+        images = [image for image in article_data.get("images", []) 
+                  if image.get("type") != "stitcher" and "width" in image and "height" in image]
         media = [
             {
-                image["type"] if "type" in image else f"{image["width"]}x{image["height"]}" : {
+                image.get("type", f"{image['width']}x{image['height']}"): {
                     "url": image["url"],
-                    "alt": "" if "alt" not in image else image["alt"],
-                    "caption": "" if "caption" not in image else image["caption"],
-                    "name": "" if "name" not in image else image["name"],
+                    "alt": image.get("alt", ""),
+                    "caption": image.get("caption", ""),
+                    "name": image.get("name", ""),
                     "height": int(image["height"]),
                     "width": int(image["width"]),
-                    "credit": "" if "credit" not in image else image["credit"],
+                    "credit": image.get("credit", ""),
                 }
-            } for image in article_data["images"] if "width" in image and "height" in image
+            } for image in images
         ]
+        return {**content, "metadata": metadata, "media": media}
 
-        return {
-            **main_props,
-            "metadata": metadata,
-            "media": media
-        }
+    def get_content(self, url: str, params: dict = {}) -> dict:
+        res= requests.get(url, params=params)
+        if res.status_code != 200:
+            print(res, res.json())
+            print("Request url:", url)
+            return {} 
+        data = res.json()
+        return data
 
-    def process_articles(self, data) -> list:
-        processed_articles = []
-        for sport in data:
-            leagues = data[sport]
-            for league in leagues:
-                articles = leagues[league]
-                for article_data in articles:
-                    article = self.format_article(
-                        sport,
-                        league,
-                        article_data)
-                    processed_articles.append(article)
-        return {i: article for i, article in enumerate(processed_articles)}
+    def update_fetch_date(self) -> None:
+        self.set_fetch_date(datetime.datetime.now())
+
+    def set_fetch_date(self, date: datetime.datetime) -> None:
+        self.previous_fetch_date = date
+        self.api_data["prevFetchDate"] = self.previous_fetch_date.isoformat()
+        self.write_data_to_file(self.api_data_path, self.api_data)
+
+    def get_fetch_date(self) -> datetime.datetime:
+        if "prevFetchDate" not in self.api_data:
+            return datetime.datetime.now()
+        return datetime.datetime.fromisoformat(self.api_data["prevFetchDate"])
     
-    def write_data_to_file(self, file_path: str, data: dict):
+    def has_day_passed(self, previous_date: datetime.datetime, current_date: datetime.datetime) -> bool:
+        return (current_date - previous_date).days >= 1
+
+    @staticmethod
+    def get_news_url(sport: str, league: str) -> str:
+        return f"https://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/news"
+
+    @staticmethod
+    def write_data_to_file(file_path: str, data: dict):
         with open(file_path, "w") as file:
             json.dump(data, file, indent=4, sort_keys=True)
 
@@ -146,13 +139,13 @@ def main():
     api_folder_path = path.join(cwd, "espn")
     api_data_path = path.join(api_folder_path, "api.data.json")
     espn = ESPNAPI(api_data_path)
-    api_data = espn.collect_api_data()
+    content = espn.fetch_sports_content()
     output_file_path = path.join(api_folder_path, "response.json")
-    espn.write_data_to_file(output_file_path, api_data)
+    espn.write_data_to_file(output_file_path, content)
 
-    articles = espn.process_articles(api_data)
+    processed_content = espn.process_sports_content(content)
     output_file_path = path.join(api_folder_path, "articles.json")
-    espn.write_data_to_file(output_file_path, articles)
+    espn.write_data_to_file(output_file_path, processed_content)
 
 
 if __name__ == "__main__":
