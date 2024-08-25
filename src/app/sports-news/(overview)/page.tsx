@@ -4,6 +4,8 @@ import LatestNews from "@/components/sports-news/latest-news";
 import Divider from '@mui/material/Divider';
 import { Suspense } from "react";
 
+import { promises as fs } from 'fs';
+
 export default async function Page({
     searchParams,
 }: {
@@ -12,13 +14,20 @@ export default async function Page({
         league?: string;
     }
 }) {
-    const sport = searchParams?.sport || 'All';
-    const league = searchParams?.league || 'All';
+    const sportParam = searchParams?.sport || "all";
+    const leagueParam = searchParams?.league || "all";
+
+    const file = await fs.readFile(process.cwd() + '/src/lib/api.data.json', 'utf8');
+    const data = JSON.parse(file);
+    const sports = data.sports;
+    const sport = Object.hasOwn(sports, sportParam) ? sportParam : "all";
+    const league = Object.hasOwn(sports[sport], leagueParam) ? leagueParam : "all";
+    const leagues = data.leagues[sport];
 
     return (
         <>
             {/* Main Body */}
-            <ContentFilter sport={sport}/>
+            <ContentFilter sports={sports} leagues={leagues}/>
             <Divider sx={{ my: 2 }} />
             <Suspense fallback={<div>Loading Latest News...</div>}>
                 <LatestNews sport={sport} league={league}/>

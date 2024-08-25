@@ -9,33 +9,62 @@ import {
     MenuItem,
     Divider, 
 } from "@mui/material";
-import { sportOptions, leagueOptions } from "@/lib/placeholder-data";
+import { ButtonProps } from '@mui/material/Button';
+import clsx from 'clsx';
+import SportsFootballIcon from '@mui/icons-material/SportsFootball';
+import SportsSoccer from '@mui/icons-material/SportsSoccer';
+import SportsBaseballIcon from '@mui/icons-material/SportsCricket';
+import PublicIcon from '@mui/icons-material/Public';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+
+import { styled } from '@mui/material/styles';
 
 
 interface ContentFilterProps {
-    sport: string,
+    sports: {
+        [key: string]: {
+            title: string;
+        };
+    },
+    leagues: {
+        [key: string]: {
+            title: string;
+        };
+    }
 }
 
 export default function ContentFilter({
-    sport,
+    sports,
+    leagues
 }: ContentFilterProps) {
     return (
         <Grid container spacing={2} id="news-filter-grid-container" >
             <Grid item xs={6} id="sport-filter-grid-item" sx={{ display:'flex', justifyContent:'center'}}>
-                <MenuFilter label="Sport" paramKey="sport" items={sportOptions}/>
+                <MenuFilter label="Sport" paramKey="sport" items={sports}/>
             </Grid>
 
             <Grid item xs={6} id="league-filter-grid-item" sx={{ display:'flex', justifyContent:'center'}}>
-                <MenuFilter label="League" paramKey="league" items={leagueOptions[sport]}/>
+                <MenuFilter label="League" paramKey="league" items={leagues}/>
             </Grid>
         </Grid>
     )
 }
 
+const StyledButton = styled(Button)<ButtonProps>(({ theme }) => ({
+    '&.Mui-disabled': {
+        color: theme.palette.primary.main,
+    },
+}));
+
+
 interface MenuFilterProps {
-    label: string,
-    paramKey: string,
-    items: string[],
+    label: string;
+    paramKey: string;
+    items: {
+        [key: string]: {
+            title: string;
+        };
+    }
 }
 
 function MenuFilter({
@@ -59,26 +88,41 @@ function MenuFilter({
     function handleSelection(key:string, value: string) {
         const params = new URLSearchParams(searchParams);
         params.set(key, value);
-        if (key === "sport") {
-            params.set("league", "All");
-        }
+        if (key === "sport") params.set("league", "all");
         replace(`${pathname}?${params.toString()}`);
-    }
+   }
+
+    const currentSelection = searchParams.get(paramKey) || "all";
 
     return (
         <>
+            <StyledButton
+                id={paramKey + "-label-button"}
+                aria-controls={undefined}
+                aria-haspopup="false"
+                aria-expanded={undefined}
+                disableFocusRipple={true}
+                disableRipple={true}
+                disabled={true}
+            >
+                <Typography variant="body1" >{label}</Typography>
+                <Divider orientation="vertical" flexItem sx={{mx:2}}/>
+
+            </StyledButton>
             <Button
                 id={paramKey + "-button"}
                 aria-controls={open ? 'basic-menu' : undefined}
                 aria-haspopup="true"
                 aria-expanded={open ? 'true' : undefined}
                 onClick={handleClick}
-                disabled={items.length === 0}
+                disabled={Object.keys(items).length === 0}
             >
-                <Typography variant="body1" >{label}</Typography>
-                <Divider orientation="vertical" flexItem sx={{mx:2}}/>
-                {/* <currentSelection.icon /> */}
-                <Typography variant="body1" >{searchParams.get(paramKey) || "All"}</Typography>
+                {currentSelection === "all" && <PublicIcon/>}
+                {currentSelection === "soccer" && <SportsSoccer/>}
+                {currentSelection === "football" && <SportsFootballIcon/>}
+                {currentSelection === "baseball" && <SportsBaseballIcon/>}
+                <Typography variant="body1" >{items[currentSelection]?.title || "All"}</Typography>
+                <KeyboardArrowDownIcon/>
             </Button>
             <Menu
                 id="basic-menu"
@@ -89,18 +133,17 @@ function MenuFilter({
                 'aria-labelledby': paramKey + '-button',
                 }}
             >
-                {items.map((item) => (
+                {Object.keys(items).map((item: string) => (
                     <MenuItem 
-                        key={item} 
+                        key={item + "-menu-item"} 
                         onClick={() => {
                             handleSelection(paramKey, item);
                             handleClose();
                         }}
-                        disabled={item === searchParams.get(paramKey)
-                            || (searchParams.get(paramKey) === null && item === "All")
-                        }
+                        disabled={item === searchParams.get(paramKey)}
+
                     >
-                            {item}
+                            {items[item].title}
                     </MenuItem>
                 ))}
             </Menu>

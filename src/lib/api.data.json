@@ -1,0 +1,49 @@
+{
+    "sports": {
+        "all": {
+            "title": "All"
+        },
+        "soccer": {
+            "title": "Soccer"
+        },
+        "baseball": {
+            "title": "Baseball"
+        },
+        "football": {
+            "title": "Football"
+        }
+    },
+    "leagues": {
+        "all": {},
+        "soccer": {
+            "all": {
+                "title": "All"
+            },
+            "mls": {
+                "title": "MLS"
+            },
+            "la-liga": {
+                "title": "La Liga"
+            },
+            "premier-league": {
+                "title": "Premier League"
+            }
+        },
+        "baseball": {
+            "all": {
+                "title": "All"
+            },
+            "mlb": {
+                "title": "MLB"
+            }
+        },
+        "football": {
+            "all": {
+                "title": "All"
+            },
+            "nfl": {
+                "title": "NFL"
+            }
+        }
+    }
+}
