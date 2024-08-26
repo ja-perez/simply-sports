@@ -1,4 +1,4 @@
-from pymongo import MongoClient, TEXT
+from pymongo import MongoClient
 from dotenv import dotenv_values
 import os
 
@@ -6,17 +6,51 @@ from news_articles.guardian.api import GuardianAPI
 from news_articles.espn.api import ESPNAPI
 
 
-def process_api_data(api) -> None:
+def process_api_data(api) -> dict:
     content = api.fetch_sports_content()
     processed_content = api.process_sports_content(content)
+    return processed_content
+
+
+def upload_articles_to_mongo(collection, processed_content) -> None:
     if not processed_content:
-        print("No new articles to upload")
+        print("No articles to upload")
         return
-    print(f"Uploading {api.__class__.__name__} articles to MongoDB")
-    upload_articles_to_mongo(processed_content)
+    for sport in processed_content:
+        leagues = processed_content[sport]
+        for league in leagues:
+            articles = leagues[league]
+            insert_count = 0
+            for article in articles:
+                if collection.find_one({"article_id": article["article_id"]}):
+                    continue
+                collection.insert_one(article)
+                insert_count += 1
+            print(f"Inserted {insert_count} articles for {sport} - {league}")
+    print("Finished uploading articles to MongoDB")
 
 
-def upload_articles_to_mongo(processed_content) -> None:
+def unset_field(collection, filter, field) -> None:
+    # collection.update_many(filter, [{"$project": {field: 0}}])
+    collection.update_many(filter, {"$unset": {field: ""}})
+
+
+def update_espn_articles(collection) -> None:
+    articles = collection.find({"metadata.site": "ESPN"})
+    for article in articles:
+        media_list = article["media"]
+        media_items = {}
+        for item in media_list:
+            item_type = [item_cat for item_cat in item][0]
+            item_data = item[item_type]
+            if item_type == "stitcher":
+                continue
+            media_items.setdefault(item_type, []).append(item_data)
+        article_id = article["_id"]
+        collection.update_one({"_id": article_id}, {"$set": {"old_media": media_list, "media": media_items}})
+
+
+def main():
     config = dotenv_values(".env")
     env_mode = config["MODE"]
     db_name = config["MONGO_NAME"]
@@ -31,20 +65,6 @@ def upload_articles_to_mongo(processed_content) -> None:
     db = client[db_name]
     collection = db["articles"]
 
-    for sport in processed_content:
-        leagues = processed_content[sport]
-        for league in leagues:
-            articles = leagues[league]
-            insert_count = 0
-            for article in articles:
-                if collection.find_one({"article_id": article["article_id"]}):
-                    continue
-                collection.insert_one(article)
-                insert_count += 1
-            print(f"Inserted {insert_count} articles for {sport} - {league}")
-    
-
-def main():
     # Base file paths
     cwd = os.getcwd()
     if "backend" not in cwd:
@@ -58,13 +78,21 @@ def main():
     guardian = GuardianAPI(
         api_key="test",
         api_data_path=guardian_api_data_path)
-    process_api_data(guardian)
+    processed_guardian_data = process_api_data(guardian)
 
     # ESPN API
     espn_folder_path = os.path.join(cwd, "espn")
     espn_api_data_path = os.path.join(espn_folder_path, "api.data.json")
     espn = ESPNAPI(espn_api_data_path)
-    process_api_data(espn)
+    processed_espn_data = process_api_data(espn)
+
+    print()
+
+    print(f"Uploading The Guardian articles to MongoDB")
+    upload_articles_to_mongo(collection, processed_guardian_data)
+
+    print(f"Uploading ESPN articles to MongoDB")
+    upload_articles_to_mongo(collection, processed_espn_data)
 
 
 if __name__ == "__main__":

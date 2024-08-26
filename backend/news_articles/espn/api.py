@@ -59,6 +59,8 @@ class ESPNAPI:
         processed_articles = []
         for article in articles:
             # Filtering
+            if not article.get("images"):
+                continue
             # Formatting
             processed_article = self.format_article(article)
             # Append to list
@@ -80,9 +82,10 @@ class ESPNAPI:
         }
         images = [image for image in article_data.get("images", []) 
                   if image.get("type") != "stitcher" and "width" in image and "height" in image]
-        media = [
-            {
-                image.get("type", f"{image['width']}x{image['height']}"): {
+        media_types = set([image.get("type", f"{image['width']}x{image['height']}") for image in images])
+        media = {
+            media_type: [
+                {
                     "url": image["url"],
                     "alt": image.get("alt", ""),
                     "caption": image.get("caption", ""),
@@ -90,9 +93,10 @@ class ESPNAPI:
                     "height": int(image["height"]),
                     "width": int(image["width"]),
                     "credit": image.get("credit", ""),
-                }
-            } for image in images
-        ]
+
+                } for image in images if image.get("type", f"{image['width']}x{image['height']}") == media_type
+            ] for media_type in media_types
+        }
         return {**content, "metadata": metadata, "media": media}
 
     def get_content(self, url: str, params: dict = {}) -> dict:
