@@ -5,19 +5,20 @@ import {
     leagueModel,
     teamModel,
     playerModel,
-} from './schemas';
+} from '@/lib/schemas';
 import {
     Article,
     Sport,
     League,
     Team,
     Player,
-} from './definitions';
+} from '@/lib/definitions';
+
 
 export async function connectToDatabase() {
     try {
         if (connection.readyState === 0) {
-            await connect('mongodb://localhost:27017/simply_sports');
+            await connect('mongodb://localhost:27017/simply-sports');
             console.log('Connected to database');
         } else if (connection.readyState === 1) {
             console.log('Already connected to database: ', connection.name);
@@ -28,6 +29,7 @@ export async function connectToDatabase() {
         console.error("Error: ", err);
     }
 }
+
 
 export async function fetchSports() {
     try {
@@ -74,14 +76,53 @@ export async function fetchArticlesBySportLeague(sport: string, league: string) 
     try {
         await connectToDatabase();
         console.log(`Fetching articles for sport: ${sport}, league: ${league}`);
-        var articlesQuery = articleModel.find({});
-        if (sport !== "All") {
+        const sourcesQuery = articleModel.distinct("metadata.site");
+        const sources: String[] = await sourcesQuery.exec();
+
+        const articles = sources.map(async (source) => {
+            const sourceArticlesQuery = articleModel.find({
+                "metadata.site": source,
+            });
+            if (sport !== "all") {
+                sourceArticlesQuery.find({ sport: sport });
+            }
+            if (league !== "all") {
+                sourceArticlesQuery.find({ league: league });
+            }
+            const sourceArticlesData = await sourceArticlesQuery.limit(6).exec();
+            const sourceArticles: Article[] = sourceArticlesData.map((article) => article.toJSON());
+            return { source: source, articles: sourceArticles};
+        })
+        return articles;
+    } catch (err) {
+        console.error("Error fetching articles");
+        console.error("Error: ", err);
+        return null;
+    }
+}
+
+export async function fetchArticlesBySourceSportLeague(source: string, sport: string, league: string) {
+    try {
+        await connectToDatabase();
+        console.log(`Fetching articles for source: ${source}, sport: ${sport}, league: ${league}`);
+        var query = articleModel.aggregate([
+            { $match: {
+                source: source,
+                $or: [
+                    { sport: sport },
+                    { league: league },
+                ],
+            }}
+        ])
+     
+        var articlesQuery = articleModel.find({ source: source });
+        if (sport !== "all") {
             articlesQuery = articlesQuery.find({ sport: sport });
         }
-        if (league !== "All") {
+        if (league !== "all") {
             articlesQuery = articlesQuery.find({ league: league });
         }
-        const articlesData = await articlesQuery.exec();
+        const articlesData = await articlesQuery.limit(6).exec();
         const articles: Article[] = articlesData.map((article) => article.toJSON());
         console.log(`Fetched ${articles.length} articles`);
         return articles;
@@ -90,5 +131,4 @@ export async function fetchArticlesBySportLeague(sport: string, league: string) 
         console.error("Error: ", err);
         return null;
     }
-
 }
