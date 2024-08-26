@@ -1,4 +1,4 @@
-import { fetchArticlesBySportLeague} from '@/lib/data';
+import { fetchArticlesBySourceSportLeague} from '@/lib/data';
 import { testArticle } from '@/lib/placeholder-data';
 
 import Grid from '@mui/material/Grid';
@@ -8,35 +8,46 @@ import Link from 'next/link';
 interface LatestNewsProps {
     sport: string;
     league: string;
+    sources: string[];
 }
 
 export default async function LatestNews({
     sport,
     league,
+    sources,
 }: LatestNewsProps) {
-    const articles = await fetchArticlesBySportLeague(sport, league);
+    var articlesBySource: {[source: string]: Article[]} = {};
+    for (const source of sources) {
+        const articles = await fetchArticlesBySourceSportLeague(source, sport, league);
+        articlesBySource[source] = articles ? articles : [];
+    }
+
     const testArticles: Article[] = [];
     for (let i = 0; i < 9; i++) {
         const tempArticle: Article = {...testArticle, id: i.toString()}
         testArticles.push(tempArticle)
     }
+    const testArticlesBySource = sources.map((source) => {
+        return { source: source, articles: testArticles }
+    })
 
     return (
         <>
         <Grid container spacing={2} id="latest-news-grid-container">
             <Grid item xs={12} id="latest-news-grid-item-0"
             sx={{ display:"flex", justifyContent:"space-around"}}>
-                <Link href={`#${"latest-news-grid-item-1"}`}>
-                    <Chip label="Item 1"/>
-                </Link>
-                <Link href={`#${"latest-news-grid-item-2"}`}>
-                    <Chip label="Item 2"/>
-                </Link>
-                <Link href={`#${"latest-news-grid-item-3"}`}>
-                    <Chip label="Item 3"/>
-                </Link>
+                {testArticlesBySource.map((source) => (
+                    <Link href={`#${source.source}-news-grid-item`} key={source.source}>
+                        <Chip label={source.source}/>
+                    </Link>
+                ))}
             </Grid>
-            <Grid item xs={12} id="latest-news-grid-item-1">
+            {testArticlesBySource.map((source) => (
+                <Grid item xs={12} id={`${source.source}-news-grid-item`} key={source.source}>
+                    <ArticleRibbon source={source.source} articles={source.articles}/>
+                </Grid>
+            ))}
+            {/* <Grid item xs={12} id="latest-news-grid-item-1">
                 <ArticleRibbon source="Latest News" articles={testArticles}/>
             </Grid>
             <Grid item xs={12} id="latest-news-grid-item-2">
@@ -44,7 +55,7 @@ export default async function LatestNews({
             </Grid>
              <Grid item xs={12} id="latest-news-grid-item-3">
                 <ArticleRibbon source="Latest News" articles={testArticles}/>
-            </Grid>           
+            </Grid>            */}
         </Grid>
         </>
     );

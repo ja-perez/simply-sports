@@ -23,6 +23,7 @@ export default async function Page({
     const sport = Object.hasOwn(sports, sportParam) ? sportParam : "all";
     const league = Object.hasOwn(sports[sport], leagueParam) ? leagueParam : "all";
     const leagues = data.leagues[sport];
+    const sources = data.sources;
 
     return (
         <>
@@ -30,7 +31,7 @@ export default async function Page({
             <ContentFilter sports={sports} leagues={leagues}/>
             <Divider sx={{ my: 2 }} />
             <Suspense fallback={<div>Loading Latest News...</div>}>
-                <LatestNews sport={sport} league={league}/>
+                <LatestNews sport={sport} league={league} sources={sources}/>
             </Suspense>
         </>
     );
