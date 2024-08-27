@@ -10,21 +10,9 @@ import Toolbar from '@mui/material/Toolbar';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 
-import Link from 'next/link';
-
-import Home from '@mui/icons-material/Home';
-import School from '@mui/icons-material/School';
-import LocalActivity from '@mui/icons-material/LocalActivity';
+import CustomLink from '@/components/custom-link';
+import { topBarNavLinks } from '@/components/nav-links';
 import Sports from '@mui/icons-material/Sports';
-import SportsSoccer from '@mui/icons-material/SportsSoccer';
-
-
-const links = [
-    { name: 'home', label: 'Home', href: '/', icon: Home, sections: ['about', 'features', 'background']},
-    { name: 'sports-news', label: 'Sports News', href: '/sports-news', icon: SportsSoccer, sections: ['news', 'sports']},
-    { name: 'learn', label: 'Learning Academy', href: '/learn', icon: School, sections: ['tutorials', 'courses', 'resources']},
-    { name: 'practice', label: 'Practice Lounge', href: '/practice', icon: LocalActivity, sections: ['lounge', 'tutorial']},
-]
 
 export default function TopBarNav() {
     return (
@@ -92,23 +80,23 @@ function TopBarRightSide() {
 
 function TopBarLogo() {
     return (
-        <Link href="/" className="flex items-center">
+        <CustomLink href="/" {...{ className:"flex items-center" }}>
             <Sports />
             <Typography variant="body1" sx={{ pr: '12px'}}>
                 SimplySports
             </Typography>
-        </Link>
+        </CustomLink>
     )
 }
 
 function TopBarLinks() {
     return (
         <Box sx={{ display: {xs: 'none', md: 'flex'} }}>
-            {links.map((link) => (
-                <Link
-                    key={link.name}
+            {topBarNavLinks.map((link) => (
+                <CustomLink
                     href={link.href}
-                    className="py-6px px-12px "
+                    key={link.name}
+                    {...{ className:"flex items-center" }}
                 >
                     <MenuItem
                         sx={{ py: '6px', px: '12px', borderRadius: '5px'}}
@@ -117,7 +105,7 @@ function TopBarLinks() {
                             {link.label}
                         </Typography>
                     </MenuItem>
-                </Link>
+                </CustomLink>
             ))}
         </Box>
     )

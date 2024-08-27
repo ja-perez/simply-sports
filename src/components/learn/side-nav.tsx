@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import CustomLink from '@/components/custom-link'
 
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
@@ -11,14 +11,13 @@ import ListItemText from '@mui/material/ListItemText'
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
 
+import { learnSideNav } from '@/components/nav-links'
+
+
 const learnProps = {
     page_id: "learn",
     subheader: "Learn Navigation",
-    links: [
-        { name: 'introduction', label: 'Introduction', href: '/learn/introduction'},
-        { name: 'terminology', label: 'Terminology', href: '/learn/terminology'},
-        { name: 'resources', label: 'Resources', href: '/learn/resources'},
-    ],
+    links: learnSideNav
 }
 
 export default function SideNav() {
@@ -36,30 +35,32 @@ export default function SideNav() {
                         }
                     >
                         {learnProps.links.map((link) => (
-                            <Link
-                                key={link.name}
+                            <CustomLink
                                 href={link.href}
+                                key={link.name}
                             >
                                 <ListItemButton>
                                     <ListItemText primary={link.label} />
                                 </ListItemButton>
-                            </Link>
+                            </CustomLink>
                         ))}
                     </List>
                 </Box>
             </Paper>
             <Paper elevation={5} sx={{ borderRadius: '5px' }} >
                 <Box sx={{ borderRadius: '5px', bgcolor: 'teal' }} my={2} id='practice-button-box' >
-                    <Link
+                    <CustomLink
+                        href="practice"
                         key="practice-link"
-                        href="/practice"
-                        id="practice-link"
-                        className="flex justify-center"
+                        {...{
+                            id:"practice-link",
+                            className:"flex justify-center"
+                        }}
                     >
                         <Button id="practice-button" sx={{ color: 'white', width: '100%' }}>
                             <Typography variant="button" id="practice-label">Practice</Typography>
                         </Button>
-                    </Link>
+                    </CustomLink>
                 </Box>
             </Paper>
         </>

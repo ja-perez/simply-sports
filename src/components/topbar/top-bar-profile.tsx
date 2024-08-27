@@ -12,7 +12,7 @@ import Divider from '@mui/material/Divider';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 
-import Link from 'next/link';
+import CustomLink from '@/components/custom-link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 
