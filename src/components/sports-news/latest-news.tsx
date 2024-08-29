@@ -1,5 +1,4 @@
-import { fetchArticlesBySourceSportLeague} from '@/lib/data';
-import { testArticle } from '@/lib/placeholder-data';
+import { fetchArticlesByParams } from '@/lib/data';
 
 import Grid from '@mui/material/Grid';
 import Chip from '@mui/material/Chip';
@@ -8,54 +7,35 @@ import Link from 'next/link';
 interface LatestNewsProps {
     sport: string;
     league: string;
-    sources: string[];
 }
 
 export default async function LatestNews({
     sport,
     league,
-    sources,
 }: LatestNewsProps) {
-    var articlesBySource: {[source: string]: Article[]} = {};
-    for (const source of sources) {
-        const articles = await fetchArticlesBySourceSportLeague(source, sport, league);
-        articlesBySource[source] = articles ? articles : [];
-    }
-
-    const testArticles: Article[] = [];
-    for (let i = 0; i < 9; i++) {
-        const tempArticle: Article = {...testArticle, id: i.toString()}
-        testArticles.push(tempArticle)
-    }
-    const testArticlesBySource = sources.map((source) => {
-        return { source: source, articles: testArticles }
-    })
+    console.log("Fetching articles for sport: ", sport, " league: ", league);
+    const params: {[key: string]: string} = {};
+    if (sport !== "all") params["metadata.sport"] = sport;
+    if (league !== "all") params["metadata.league"] = league;
+    const res = await fetchArticlesByParams(params);
+    const articles = res ? res : {};
 
     return (
         <>
         <Grid container spacing={2} id="latest-news-grid-container">
             <Grid item xs={12} id="latest-news-grid-item-0"
-            sx={{ display:"flex", justifyContent:"space-around"}}>
-                {testArticlesBySource.map((source) => (
-                    <Link href={`#${source.source}-news-grid-item`} key={source.source}>
-                        <Chip label={source.source}/>
+            sx={{ display:"flex", justifyContent:"left"}}>
+                {Object.entries(articles).map( source => (
+                    <Link href={`#${source[0]}-news-grid-item`} key={source[0]}>
+                        <Chip label={source[0]} sx={{ marginX:"5px" }}/>
                     </Link>
                 ))}
             </Grid>
-            {testArticlesBySource.map((source) => (
-                <Grid item xs={12} id={`${source.source}-news-grid-item`} key={source.source}>
-                    <ArticleRibbon source={source.source} articles={source.articles}/>
+            {Object.entries(articles).map((source) => (
+                <Grid item xs={12} id={`${source[0]}-news-grid-item`} key={source[0]}>
+                    <ArticleRibbon source={source[0]} articles={source[1]}/>
                 </Grid>
             ))}
-            {/* <Grid item xs={12} id="latest-news-grid-item-1">
-                <ArticleRibbon source="Latest News" articles={testArticles}/>
-            </Grid>
-            <Grid item xs={12} id="latest-news-grid-item-2">
-                <ArticleRibbon source="Latest News" articles={testArticles}/>
-            </Grid>
-             <Grid item xs={12} id="latest-news-grid-item-3">
-                <ArticleRibbon source="Latest News" articles={testArticles}/>
-            </Grid>            */}
         </Grid>
         </>
     );
@@ -76,7 +56,7 @@ function ArticleRibbon({
             container 
             spacing={2} 
             id="article-ribbon-grid-container"
-            sx={{ outline:"dashed 1px", marginTop: "0"}}
+            sx={{ marginTop: "0"}}
         >
             <Grid item xs={12} id="article-ribbon-title-grid-item">
                 <h2>{source}</h2>
@@ -89,8 +69,8 @@ function ArticleRibbon({
             >
                 {articles.map((article) => (
                     <div 
-                        key={article.id} 
-                        id={article.id} 
+                        key={article.article_id} 
+                        id={article.article_id} 
                         className="outline-dashed p-4 m-2 min-w-64"> 
                         <ArticleCard article={article}/>
                     </div>
@@ -107,33 +87,54 @@ import { CardActionArea } from '@mui/material';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
+import passage from 'next-auth/providers/passage';
 
 function ArticleCard({ article }: { article: Article }) {
+    const article_id = article.article_id;
+    const article_href = article.href;
+    const article_site = article.metadata.site;
+    const article_image = extractImgBySrc(article, "");
+    const article_title = article.title;
+    const article_date = article.metadata.date.toDateString();
     return (
         <>
-        <Card id={`card-article-${article.id}`}>
-            <CardActionArea href={article.href} target="_blank">
+        <Card id={`card-article-${article_id}`}>
+            <CardActionArea href={article_href} target="_blank">
                 <CardMedia
                     id="article-card-media"
                     component="img"
-                    height={article.image.height}
-                    width={article.image.width}
-                    image={article.image.href}
-                    alt={article.image.alt}
+                    height={article_image.height}
+                    width={article_image.width}
+                    image={article_image.href}
+                    alt={article_image.alt}
                 />
                 <CardContent>
-                    <Typography variant="h5" component="div">
-                        {article.title}
-                    </Typography>
-                    <Typography variant="body1" noWrap>
-                        {article.description}
+                    <Typography variant="body1" component="div">
+                        {article_title}
                     </Typography>
                     <Typography variant="caption">
-                        {article.metadata.date.toDateString()}
+                        {article_date}
                     </Typography>
                 </CardContent>
             </CardActionArea>
         </Card>
         </>
     );
+}
+
+function extractImgBySrc(article: Article, src: string) {
+    switch (src) {
+        case "ESPN":
+            return {}
+        case "The Guardian":
+            return {}
+        default:
+            return {
+                href: "https://via.placeholder.com/150",
+                alt: "Placeholder Image",
+                height: 150,
+                width: 150,
+            }
+        
+    }
 }

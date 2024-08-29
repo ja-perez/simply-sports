@@ -72,6 +72,29 @@ export async function fetchArticleById(id: string) {
     }
 }
 
+export async function fetchArticlesByParams(params: { [key: string]: string }) {
+    try {
+        await connectToDatabase();
+        const sites = await articleModel.distinct("metadata.site").exec();
+
+        const siteArticles: {[site: string]: Article[]} = {};
+        for (const siteIndex in sites) {
+            const site = sites[siteIndex];
+            params["metadata.site"] = site;
+            const query = articleModel.find(params).sort({"metadata.date": -1}).limit(6);
+            const siteArticlesData = await query.exec();
+            siteArticles[site] = siteArticlesData.map((article) => article.toJSON());
+        }
+        return siteArticles;
+    } catch (err) {
+        console.error("Error fetching articles");
+        console.error("Error: ", err);
+        return null;
+    }
+
+}
+
+
 export async function fetchArticlesBySportLeague(sport: string, league: string) {
     try {
         await connectToDatabase();
