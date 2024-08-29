@@ -8,7 +8,7 @@ import {
 } from './definitions';
 
 var articleSchema = new Schema<Article>({
-    id: { type: String, required: true },
+    article_id: { type: String, required: true },
     title: { type: String, required: true },
     description: { type: String, required: true },
     image: {
