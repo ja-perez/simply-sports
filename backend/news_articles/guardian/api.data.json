@@ -1,8 +1,12 @@
 {
-    "prevFetchDate": "2024-08-27T07:59:29.786934",
+    "prevFetchDate": "2024-08-28T17:26:20.162876",
     "sports": {
         "baseball": {
             "leagues": {
+                "all": {
+                    "title": "All",
+                    "value": "baseball"
+                },
                 "mlb": {
                     "title": "MLB",
                     "value": "mlb"
