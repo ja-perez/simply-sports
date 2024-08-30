@@ -45,15 +45,17 @@ export default function ArticleRibbon({
                 item 
                 xs={12} 
                 id="article-ribbon-articles-grid-item"
-                sx={{ display: "flex", justifyContent: "space-around", overflow: "hidden"}}
+                sx={{ display: "flex", justifyContent: "space-around"}}
             >
                 {currArticles.map((article) => (
-                    <div 
+                    <Grid
+                        item xs={4}
+                        spacing={2}
                         key={article.article_id} 
                         id={article.article_id} 
                         className="outline-dashed p-4 m-2 min-w-64"> 
                         <ArticleCard article={article}/>
-                    </div>
+                    </Grid>
                 ))}
             </Grid>
         </Grid>
@@ -70,8 +72,8 @@ function ArticleCard({ article }: { article: Article }) {
     const article_date = article.metadata.date.toDateString();
     return (
         <>
-        <Card id={`card-article-${article_id}`}>
-            <CardActionArea href={article_href} target="_blank">
+        <Card id={`card-article-${article_id}`} sx={{ height:"100%"}}>
+            <CardActionArea href={article_href} target="_blank" sx={{ height:"100%"}}>
                 <CardMedia
                     id="article-card-media"
                     component="img"
@@ -80,7 +82,7 @@ function ArticleCard({ article }: { article: Article }) {
                     image={article_image.href}
                     alt={article_image.alt}
                 />
-                <CardContent>
+                <CardContent sx={{ height:"auto" }}>
                     <Typography variant="body1" component="div">
                         {article_title}
                     </Typography>
