@@ -1,5 +1,5 @@
-import ContentFilter from "@/components/sports-news/content-filter";
-import LatestNews from "@/components/sports-news/latest-news";
+import ContentFilter from "@/components/news-teams/content-filter";
+import LatestNews from "@/components/news-teams/latest-news";
 
 import Divider from '@mui/material/Divider';
 import { Suspense } from "react";

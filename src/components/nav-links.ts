@@ -10,9 +10,9 @@ const homeLink = {
     sections: ['about', 'features', 'background']
 }
 const newsTeamsLink = {
-    name: 'sports-news',
-    label: 'Sports News',
-    href: 'sports-news',
+    name: 'news-teams',
+    label: 'News & Teams',
+    href: 'news-teams',
     icon: NewspaperIcon,
     sections: ['about', 'features', 'background']
 }
