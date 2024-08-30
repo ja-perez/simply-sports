@@ -30,6 +30,7 @@ class GuardianAPI:
             
         content = {}
         sports = self.api_data.get("sports", {})
+        print(f"Fetching articles from The Guardian API")
         for sport in sports:
             sport_data = sports[sport]
             content[sport] = {}

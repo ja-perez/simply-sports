@@ -26,6 +26,7 @@ class ESPNAPI:
 
         content = {}
         sports = self.api_data.get("sports", {})
+        print(f"Fetching articles from ESPN API")
         for sport in sports:
             sport_data = sports[sport]
             content[sport] = {}

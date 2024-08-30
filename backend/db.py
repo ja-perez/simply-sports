@@ -51,13 +51,18 @@ def update_espn_articles(collection) -> None:
 
 
 def main():
-    config = dotenv_values(".env")
+    # .env file path
+    cwd = os.getcwd()
+    if "backend" in cwd:
+        cwd = os.path.join(cwd, "..")
+    env_path = os.path.join(cwd, ".env")
+    config = dotenv_values(env_path)
     env_mode = config["MODE"]
     db_name = config["MONGO_NAME"]
     if (env_mode == "prod"):
         db_user, db_password = config["MONGO_USER"], config["MONGO_PASSWORD"]
         db_host = config["MONGO_HOST"]
-        db_uri = f"mongodb+srv://{db_user}:{db_password}@{db_host}:27017/{db_name}?authSource=admin"
+        db_uri = f"mongodb://{db_user}:{db_password}@{db_host}:27017/{db_name}?authSource=admin"
     else:
         db_uri = "mongodb://localhost:27017/"
 
