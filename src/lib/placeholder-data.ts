@@ -58,7 +58,9 @@ const testArticle: Article = {
         sport: "Soccer",
         league: "Premier League",
         date: new Date(),
-    }
+        type: "default"
+    },
+    media: {}
 }
 
 export { sportOptions, leagueOptions, testArticle }
