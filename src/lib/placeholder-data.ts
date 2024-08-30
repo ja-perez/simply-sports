@@ -43,7 +43,7 @@ const leagueOptions: Options = {
 
 import { Article } from "./definitions";
 const testArticle: Article = {
-    id: "1",
+    article_id: "1",
     title: "Test Article",
     description: "This is a test article",
     image: {

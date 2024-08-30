@@ -20,15 +20,14 @@ export async function connectToDatabase() {
         if (connection.readyState === 0) {
             let url;
             if (process.env.MODE === "prod") {
-                url = `mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.MONGO_URL}`;
+                url = `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_URL}`;
             } else {
                 url = 'mongodb://localhost:27017/simply-sports';
             }
             await connect(url);
-            console.log('Connected to database');
+            console.log(`Connected to database: ${url}`);
         } else if (connection.readyState === 1) {
             console.log('Already connected to database: ', connection.name);
-            console.log(process.env.MONGO_URL);
         }
     } catch (err) {
         console.error("Error connecting to the database");
