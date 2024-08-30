@@ -14,6 +14,17 @@ export interface Article {
         sport: string,
         league: string,
         date: Date,
+        type: string | "default";
+    },
+    media: {
+        [key: string]: [
+            {
+                url: string;
+                alt: string | "";
+                width: number;
+                height: number;
+            }
+        ]
     }
 }
 

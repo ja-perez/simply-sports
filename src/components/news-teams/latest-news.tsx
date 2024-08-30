@@ -2,7 +2,10 @@ import { fetchArticlesByParams } from '@/lib/data';
 
 import Grid from '@mui/material/Grid';
 import Chip from '@mui/material/Chip';
-import Link from 'next/link';
+import ListItem from '@mui/material/ListItem';
+
+import { siteToMedia } from '@/components/news-teams/site-icons';
+
 
 interface LatestNewsProps {
     sport: string;
@@ -13,7 +16,6 @@ export default async function LatestNews({
     sport,
     league,
 }: LatestNewsProps) {
-    console.log("Fetching articles for sport: ", sport, " league: ", league);
     const params: {[key: string]: string} = {};
     if (sport !== "all") params["metadata.sport"] = sport;
     if (league !== "all") params["metadata.league"] = league;
@@ -23,12 +25,24 @@ export default async function LatestNews({
     return (
         <>
         <Grid container spacing={2} id="latest-news-grid-container">
-            <Grid item xs={12} id="latest-news-grid-item-0"
-            sx={{ display:"flex", justifyContent:"left"}}>
+            <Grid 
+                item xs={12} component="ul"
+                id="latest-news-source-chips-grid-item"
+                sx={{ display:"flex", justifyContent:"left"}}
+                >
                 {Object.entries(articles).map( source => (
-                    <Link href={`#${source[0]}-news-grid-item`} key={source[0]}>
-                        <Chip label={source[0]} sx={{ marginX:"5px" }}/>
-                    </Link>
+                    <ListItem key={source[0]} sx={{ width:"fit-content", padding:"5px"}}>
+                        <Chip 
+                            icon={siteToMedia(source[0])}
+                            component="a" 
+                            label={source[0]}
+                            sx={{ marginX:"5px" }}
+                            href={`#${source[0]}-news-grid-item`}
+                            clickable
+                            variant="outlined"
+                            size="medium"
+                            />                       
+                    </ListItem>
                 ))}
             </Grid>
             {Object.entries(articles).map((source) => (
@@ -40,6 +54,14 @@ export default async function LatestNews({
         </>
     );
 }
+
+import { Article } from '@/lib/definitions';
+import Card from '@mui/material/Card';
+import { CardActionArea, Divider } from '@mui/material';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import Typography from '@mui/material/Typography';
+
 
 interface articleRibbonProps {
     source: string;
@@ -81,19 +103,11 @@ function ArticleRibbon({
     );
 }
 
-import { Article } from '@/lib/definitions';
-import Card from '@mui/material/Card';
-import { CardActionArea } from '@mui/material';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Typography from '@mui/material/Typography';
-import passage from 'next-auth/providers/passage';
-
 function ArticleCard({ article }: { article: Article }) {
     const article_id = article.article_id;
     const article_href = article.href;
     const article_site = article.metadata.site;
-    const article_image = extractImgBySrc(article, "");
+    const article_image = extractImgBySrc(article, article_site);
     const article_title = article.title;
     const article_date = article.metadata.date.toDateString();
     return (
@@ -123,18 +137,37 @@ function ArticleCard({ article }: { article: Article }) {
 }
 
 function extractImgBySrc(article: Article, src: string) {
+    const media = article.media;
+    let img = {
+        href: "https://via.placeholder.com/150",
+        alt: "Placeholder Image",
+        height: 150,
+        width: 150
+    }
     switch (src) {
         case "ESPN":
-            return {}
-        case "The Guardian":
-            return {}
-        default:
-            return {
-                href: "https://via.placeholder.com/150",
-                alt: "Placeholder Image",
-                height: 150,
-                width: 150,
+            if ("header" in media) {
+                img = {...media.header[0], href: media.header[0].url}
+            } else if ("Media" in media) {
+                img = {...media.Media[0], href: media.Media[0].url}
+            } else if ("576x324" in media) {
+                img = {...media["576x324"][0], href: media["576x324"][0].url}
             }
-        
+            return img
+        case "The Guardian":
+            if ("thumbnail" in media) {
+                img.href = media.thumbnail[0].url
+                img.alt = media.thumbnail[0].alt
+                img.height = media.thumbnail[0].height
+                img.width = media.thumbnail[0].width
+            } else if ("main" in media) {
+                img.href = media.main[0].url
+                img.alt = media.main[0].alt
+                img.height = media.main[0].height
+                img.width = media.main[0].width
+            }
+            return img
+        default:
+            return img
     }
 }

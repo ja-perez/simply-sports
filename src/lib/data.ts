@@ -87,9 +87,13 @@ export async function fetchArticlesByParams(params: { [key: string]: string }) {
         for (const siteIndex in sites) {
             const site = sites[siteIndex];
             params["metadata.site"] = site;
-            const query = articleModel.find(params).sort({"metadata.date": -1}).limit(6);
+            const query = articleModel.find(params).sort({"metadata.date": -1}).limit(3);
             const siteArticlesData = await query.exec();
-            siteArticles[site] = siteArticlesData.map((article) => article.toJSON());
+            siteArticles[site] = siteArticlesData.map((article) => {
+                const jsonArticle = JSON.parse(JSON.stringify(article));
+                jsonArticle.metadata.date = new Date(jsonArticle.metadata.date);
+                return jsonArticle;
+            })
         }
         return siteArticles;
     } catch (err) {
