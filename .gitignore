@@ -46,3 +46,7 @@ backend/venv/
 backend/news_articles/archive/data/*
 backend/news_articles/archive/responses/*
 data/
+
+# bash scripts
+*.sh
+backend/*.sh
