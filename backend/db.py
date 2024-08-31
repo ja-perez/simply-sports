@@ -22,9 +22,10 @@ def upload_articles_to_mongo(collection, processed_content) -> None:
             articles = leagues[league]
             insert_count = 0
             for article in articles:
-                if collection.find_one({"article_id": article["article_id"]}):
+                articleInDB = collection.find_one({"href": article["href"]})
+                if articleInDB and articleInDB["metadata"]["date"] >= article["metadata"]["date"]:
                     continue
-                collection.insert_one(article)
+                collection.update_one({"article_id": article["article_id"]}, {"$set": article}, upsert=True)
                 insert_count += 1
             print(f"Inserted {insert_count} articles for {sport} - {league}")
     print("Finished uploading articles to MongoDB")

@@ -126,7 +126,8 @@ class GuardianAPI:
         return data.get("response", {})
 
     def update_fetch_date(self):
-        self.set_fetch_date(datetime.datetime.now())
+        start_of_day = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        self.set_fetch_date(start_of_day)
 
     def set_fetch_date(self, date: datetime.datetime):
         self.previous_fetch_date = date

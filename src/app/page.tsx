@@ -27,7 +27,7 @@ export default function Home() {
                             <Features />
                         </Grid>
                         <Divider />
-                        <Grid item xs={12} id="background-grid-item">
+                        <Grid item xs={12} id="mission-grid-item">
                             <Background />
                         </Grid>
                     </Grid>
