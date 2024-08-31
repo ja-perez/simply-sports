@@ -1,5 +1,5 @@
 import TopBarNav from '@/components/top-bar-nav';
-import { Hero, Features, Background } from '@/components/home';
+import { Hero, Features, Background, AboutUs } from '@/components/home';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Divider from '@mui/material/Divider';
