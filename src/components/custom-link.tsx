@@ -11,7 +11,7 @@ export default function CustomLink({
     children,
     ...rest
  }: CustomLinkProps) {
-    const basePath = process.env.BASE_PATH || '';
+    const basePath = process.env.BASE_PATH || "/";
     return (
         <Link href={basePath + href} {...rest}>
             {children}

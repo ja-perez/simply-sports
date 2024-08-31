@@ -22,11 +22,15 @@ export default function Home() {
                         <Grid item xs={12} id="hero-grid-item">
                             <Hero />
                         </Grid>
+                        <Grid item xs={12}>
                         <Divider />
+                        </Grid>
                         <Grid item xs={12} id="features-grid-item">
                             <Features />
                         </Grid>
+                        <Grid item xs={12}>
                         <Divider />
+                        </Grid>
                         <Grid item xs={12} id="mission-grid-item">
                             <Background />
                         </Grid>
