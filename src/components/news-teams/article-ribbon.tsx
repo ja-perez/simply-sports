@@ -42,7 +42,7 @@ export default function ArticleRibbon({
                 <h2>{source}</h2>
             </Grid>
             <Grid 
-                item 
+                item
                 xs={12} 
                 id="article-ribbon-articles-grid-item"
                 sx={{ display: "flex", justifyContent: "space-around"}}
@@ -50,7 +50,6 @@ export default function ArticleRibbon({
                 {currArticles.map((article) => (
                     <Grid
                         item xs={4}
-                        spacing={2}
                         key={article.article_id} 
                         id={article.article_id} 
                         className="outline-dashed p-4 m-2 min-w-64"> 
