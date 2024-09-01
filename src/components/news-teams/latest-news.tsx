@@ -24,7 +24,6 @@ export default async function LatestNews({
         "sport": sport === "all" ? "all" : sport,
         "league": league === "all" ? "all" : league,
     }
-    console.log(categories)
     const res = await fetchArticlesByParams(params);
     const articles = res ? res : {};
 

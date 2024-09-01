@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react';
 
 import Grid from '@mui/material/Grid';
-import Container from '@mui/material/Container'
 import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
@@ -12,7 +11,6 @@ import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
 
 import { usePathname, useSearchParams } from 'next/navigation';
-
 
 import { Article } from '@/lib/definitions';
 import { siteToMedia } from '@/components/news-teams/site-icons';
@@ -39,7 +37,6 @@ export default function ArticleRibbon({
     const searchParams = useSearchParams();
 
     useEffect(() => {
-        const url = `${pathname}?${searchParams}`;
         setCurrArticles(articles);
         setCurrCategory(categories);
     }, [pathname, searchParams, articles, categories])
