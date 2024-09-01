@@ -2,77 +2,119 @@
 import { useState, useEffect } from 'react';
 
 import Grid from '@mui/material/Grid';
+import Container from '@mui/material/Container'
 import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
+import Chip from '@mui/material/Chip'
+import Divider from '@mui/material/Divider'
+
 import { usePathname, useSearchParams } from 'next/navigation';
 
+
 import { Article } from '@/lib/definitions';
+import { siteToMedia } from '@/components/news-teams/site-icons';
+import { CardHeader } from '@mui/material';
 
 
 interface articleRibbonProps {
     source: string;
     articles: Article[];
+    categories: {
+        sport: string;
+        league: string;
+    }
 }
 
 export default function ArticleRibbon({
     source,
     articles,
+    categories,
 }: articleRibbonProps) {
-    const [currArticles, setCurrArticles] = useState(articles);
+    const [ currArticles, setCurrArticles ] = useState(articles);
+    const [ currCategory, setCurrCategory ] = useState(categories);
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
     useEffect(() => {
         const url = `${pathname}?${searchParams}`;
         setCurrArticles(articles);
-    }, [pathname, searchParams, articles])
+        setCurrCategory(categories);
+    }, [pathname, searchParams, articles, categories])
 
     return (
         <>
-        <Grid 
-            container 
-            spacing={2} 
-            id="article-ribbon-grid-container"
-            sx={{ marginTop: "0"}}
-        >
-            <Grid item xs={12} id="article-ribbon-title-grid-item">
-                <h2>{source}</h2>
-            </Grid>
-            <Grid 
-                item
-                xs={12} 
-                id="article-ribbon-articles-grid-item"
-                sx={{ display: "flex", justifyContent: "space-around"}}
+        <Card 
+            raised={true}
+            id="article-ribbon-card"
             >
-                {currArticles.map((article) => (
-                    <Grid
-                        item xs={4}
-                        key={article.article_id} 
-                        id={article.article_id} 
-                        className="outline-dashed p-4 m-2 min-w-64"> 
-                        <ArticleCard article={article}/>
-                    </Grid>
-                ))}
-            </Grid>
-        </Grid>
+            <CardHeader
+                avatar={siteToMedia(source)}
+                title={source}
+                titleTypographyProps={{ variant:"h5"}}
+                sx={{ paddingBottom:"5px", paddingTop:"8px"}}
+                id="article-ribbon-card-header"
+                />
+            <Divider variant="middle" />
+            <CardContent 
+                sx={{ paddingTop:"5px", paddingLeft:"16px", paddingBottom:"16px", '&:last-child': { pb: "16px" }}}
+                id="article-ribbon-card-content"
+                >
+                <Grid 
+                    container 
+                    spacing={1} 
+                    id="article-ribbon-card-grid-container"
+                    sx={{ marginTop: "0", flexWrap: "nowrap"}}
+                    >
+                    {currArticles.map((article) => (
+                        <Grid
+                            item xs={4}
+                            key={article.article_id} 
+                            id={article.article_id} 
+                            > 
+                            <ArticleCard article={article} category={currCategory}/>
+                        </Grid>
+                    ))}
+                </Grid>
+            </CardContent>
+        </Card>
         </>
     );
 }
 
-function ArticleCard({ article }: { article: Article }) {
+interface articleCardProps {
+    article: Article;
+    category: {
+        sport: string;
+        league: string;
+    }
+}
+
+function ArticleCard({
+    article, category 
+}: articleCardProps) {
     const article_id = article.article_id;
     const article_href = article.href;
     const article_site = article.metadata.site;
     const article_image = extractImgBySrc(article, article_site);
     const article_title = article.title;
     const article_date = article.metadata.date.toDateString();
+    const article_type = article.metadata.type ? article.metadata.type.toLowerCase() : "default";
+    const article_sport = article.metadata.sport;
+    const article_league = article.metadata.league;
     return (
         <>
         <Card id={`card-article-${article_id}`} sx={{ height:"100%"}}>
-            <CardActionArea href={article_href} target="_blank" sx={{ height:"100%"}}>
+            <CardActionArea href={article_href} target="_blank" 
+                sx={{ 
+                    height:"100%",
+                    display:"flex",
+                    flexDirection:"column",
+                    justifyContent:"start"
+                }}
+                >
                 <CardMedia
                     id="article-card-media"
                     component="img"
@@ -81,13 +123,34 @@ function ArticleCard({ article }: { article: Article }) {
                     image={article_image.href}
                     alt={article_image.alt}
                 />
-                <CardContent sx={{ height:"auto" }}>
-                    <Typography variant="body1" component="div">
+                <CardContent 
+                    sx={{ 
+                        display:"flex", 
+                        flexDirection:"column", 
+                        flexGrow: 1,
+                        justifyContent:"space-between",
+                        alignItems:"start",
+                        width:"100%",
+                    }}
+                    >
+                    <Typography variant="body1">
                         {article_title}
                     </Typography>
-                    <Typography variant="caption">
-                        {article_date}
-                    </Typography>
+                    <section id="article-card-section"
+                        className="flex justify-between items-center w-full">
+                        <Typography variant="caption">
+                            {article_date}
+                        </Typography>
+                        <section id="article-card-chips">
+                            {article_type !== "default"
+                            ? <Chip label={article_type} />
+                            : null}
+                            {category.sport === "all"
+                            ? <Chip label={article_sport} />
+                            : null}
+                            <Chip label={article_league} />
+                        </section>
+                    </section>
                 </CardContent>
             </CardActionArea>
         </Card>

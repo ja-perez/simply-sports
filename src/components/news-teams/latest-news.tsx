@@ -20,6 +20,11 @@ export default async function LatestNews({
     const params: {[key: string]: string} = {};
     if (sport !== "all") params["metadata.sport"] = sport;
     if (league !== "all") params["metadata.league"] = league;
+    const categories = {
+        "sport": sport === "all" ? "all" : sport,
+        "league": league === "all" ? "all" : league,
+    }
+    console.log(categories)
     const res = await fetchArticlesByParams(params);
     const articles = res ? res : {};
 
@@ -48,7 +53,7 @@ export default async function LatestNews({
             </Grid>
             {Object.entries(articles).map((source) => (
                 <Grid item xs={12} id={`${source[0]}-news-grid-item`} key={source[0]}>
-                    <ArticleRibbon source={source[0]} articles={source[1]}/>
+                    <ArticleRibbon source={source[0]} articles={source[1]} categories={categories}/>
                 </Grid>
             ))}
         </Grid>

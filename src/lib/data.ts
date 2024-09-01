@@ -22,7 +22,7 @@ export async function connectToDatabase() {
             if (process.env.MODE === "prod") {
                 url = `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_URL}?authSource=admin`;
             } else {
-                url = 'mongodb://localhost:27017/simply-sports';
+                url = `mongodb://localhost:27017/${process.env.MONGO_NAME}`;
             }
             await connect(url);
             console.log(`Connected to database: ${url}`);
