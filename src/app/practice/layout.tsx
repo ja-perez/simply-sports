@@ -15,14 +15,15 @@ export default function Layout({
                 maxWidth="lg" 
                 id="practice-container"
                 sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
+                    // display: 'flex',
+                    justifyItems: 'center',
+                    flexDirection: 'column',
                     height: "100vh",
                     pt: { xs: 12, sm: 16 },
                     pb: { xs: 8, sm: 12 },
                 }}
             >
-                <UnderConstruction />
+                <UnderConstruction  isProd={process.env.MODE === "prod"}/>
                 {children}
             </Container>
         </main>
