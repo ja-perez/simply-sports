@@ -1,8 +1,10 @@
+import { UnderConstruction } from "@/components/dialog"
 import TopBarNav from "@/components/top-bar-nav";
 import SideNav from "@/components/learn/side-nav";
 
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
+
 
 export default function Layout({
     children,
@@ -23,6 +25,7 @@ export default function Layout({
                 maxWidth="lg"
                 id="learn-container"
             >
+                <UnderConstruction isProd={process.env.MODE === "prod"}/>
                 <Grid container spacing={2} id="learn-content-grid-container">
 
                     {/* Side Navigation */}
