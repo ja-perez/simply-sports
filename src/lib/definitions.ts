@@ -28,6 +28,48 @@ export interface Article {
     }
 }
 
+export interface Video {
+    video_id: string;
+    title: string;
+    desription: string;
+    href: string
+    thumbnail: string;
+    metadata: {
+        site: string;
+        geoRestrictions: Array<string>;
+        embargoDate: Date;
+        expirationDate: Date;
+        date: string;
+    }
+}
+
+export interface Match {
+    match_id: string;
+    teams: [
+        { team_info: Team },
+        { team_info: Team }
+    ],
+    venue: {
+        id: string;
+        fullName: string;
+        shortName: string;
+        address: {
+            city: string;
+            country: string;
+        }
+    },
+    odds: {
+        spread: {},
+        total: {},
+        moneyline: {}
+    },
+    media: {
+        article: Article,
+        videos: Array<Video>
+    }
+
+}
+
 export interface Sport {
     id: string;
     name: string;
