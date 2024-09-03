@@ -1,47 +1,4 @@
-const sportOptions = [
-    "All",
-    "Soccer",
-    "Football",
-    "Basketball",
-    "Baseball",
-    "Hockey",
-]
-
-type Options = {
-    [key: string]: string[];
-}
-
-const leagueOptions: Options = {
-    "All": [],
-    "Soccer": [
-        "All",
-        "Premier League",
-        "La Liga",
-        "Serie A",
-        "Bundesliga",
-        "Ligue 1",
-    ],
-    "Football": [
-        "All",
-        "NFL",
-        "NCAA",
-    ],
-    "Basketball": [
-        "All",
-        "NBA",
-        "NCAA",
-    ],
-    "Baseball": [
-        "All",
-        "MLB",
-    ],
-    "Hockey": [
-        "All",
-        "NHL",
-    ],
-}
-
-import { Article } from "./definitions";
+import { Article, Match } from "./definitions";
 const testArticle: Article = {
     article_id: "1",
     title: "Test Article",
@@ -63,4 +20,9 @@ const testArticle: Article = {
     media: {}
 }
 
-export { sportOptions, leagueOptions, testArticle }
+const testMatch = {
+    match_id: "123456",
+    name: "Team A at Team B"
+}
+
+export { testArticle, testMatch }
