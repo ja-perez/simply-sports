@@ -1,3 +1,4 @@
+import { UnderConstruction } from "@/components/dialog";
 import TopBarNav from "@/components/top-bar-nav";
 
 import Container from "@mui/material/Container";
@@ -21,6 +22,7 @@ export default function Layout({
                     pb: { xs: 8, sm: 12 },
                 }}
             >
+                <UnderConstruction />
                 {children}
             </Container>
         </main>

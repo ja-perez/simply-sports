@@ -36,7 +36,7 @@ export default function SideNav() {
                     >
                         {learnProps.links.map((link) => (
                             <CustomLink
-                                href={link.href}
+                                href={"learn/" + link.href}
                                 key={link.name}
                             >
                                 <ListItemButton>

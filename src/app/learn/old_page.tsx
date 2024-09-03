@@ -6,10 +6,10 @@ export default function Learn() {
         <Container 
             id="learn-container"
         >
-                    {/* Main Body */}
-                        <Box sx={{ textAlign: 'center' }} border="dashed 1px">
-                            <p>Page Content</p>
-                        </Box>
+            {/* Main Body */}
+                <Box sx={{ textAlign: 'center' }} border="dashed 1px">
+                    <p>Page Content</p>
+                </Box>
         </Container>
     );
 }
