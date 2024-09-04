@@ -52,6 +52,12 @@ export default function Menu() {
                     <Button variant="outlined" sx={{marginY:"5px"}}>
                         Random match
                     </Button>
+                    {process.env.MODE === "prod"
+                    ? null
+                    : <Button id="dev" href="practice/session" variant="contained">
+                        practice session
+                        </Button>
+                    }
 
                 </CardContent>
 
