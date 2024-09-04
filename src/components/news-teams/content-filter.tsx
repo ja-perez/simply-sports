@@ -38,23 +38,22 @@ export default function ContentFilter({
 }: ContentFilterProps) {
     return (
         <Grid container spacing={2} id="news-filter-grid-container" >
-            <Grid item xs={6} id="sport-filter-grid-item" sx={{ display:'flex', justifyContent:'center'}}>
+            <Grid item xs={6} id="sport-filter-grid-item" sx={{ display:'flex', justifyContent:'center', alignItems:'center'}}>
                 <MenuFilter label="Sport" paramKey="sport" items={sports}/>
             </Grid>
 
-            <Grid item xs={6} id="league-filter-grid-item" sx={{ display:'flex', justifyContent:'center'}}>
+            <Grid item xs={6} id="league-filter-grid-item" sx={{ display:'flex', justifyContent:'center', alignItems:'center'}}>
                 <MenuFilter label="League" paramKey="league" items={leagues}/>
             </Grid>
         </Grid>
     )
 }
 
-const StyledButton = styled(Button)<ButtonProps>(({ theme }) => ({
-    '&.Mui-disabled': {
-        color: theme.palette.primary.main,
-    },
-}));
-
+const StyledDiv = styled('div')(({ theme }) => ({
+    ...theme.typography.button,
+    ...theme.typography.body1,
+    color: theme.palette.primary.main
+}))
 
 interface MenuFilterProps {
     label: string;
@@ -95,19 +94,10 @@ function MenuFilter({
 
     return (
         <>
-            <StyledButton
-                id={paramKey + "-label-button"}
-                aria-controls={undefined}
-                aria-haspopup="false"
-                aria-expanded={undefined}
-                disableFocusRipple={true}
-                disableRipple={true}
-                disabled={true}
-            >
-                <Typography variant="body1" >{label}</Typography>
-                <Divider orientation="vertical" flexItem sx={{mx:2}}/>
-
-            </StyledButton>
+            <StyledDiv id={paramKey + "-label"} sx={{ textAlign:"center"}}>
+                {label}
+            </StyledDiv>
+            <Divider orientation="vertical" variant="middle" flexItem sx={{mx:2}}/>
             <Button
                 id={paramKey + "-button"}
                 aria-controls={open ? 'basic-menu' : undefined}
