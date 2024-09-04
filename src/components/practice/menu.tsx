@@ -38,7 +38,7 @@ export default function Menu() {
                 matches spanning various sports, leagues, and seasons. If you find yourself losing one to many
                 fictional dollars, visit the
                 <CustomLink href="learn" {...{className:"underline"}} > Learning Academy </CustomLink>
-                for some tips and breakdowns on what goes into a "good" bet.
+                for some tips and breakdowns on what goes into a &quot;good&quot; bet.
             </Typography>
             <Card sx={{ display:'flex', flexDirection:'column', width:'max-content'}}>
                 <CardHeader
