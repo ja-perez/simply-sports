@@ -17,6 +17,9 @@ export default function NotFound() {
                     <Typography variant="subtitle1">Page not found</Typography>
                     </div>
 
+                <CustomLink href="learn" >
+                    Back to learning page
+                    </CustomLink>
                 <CustomLink href="/" >
                     Back to homepage
                     </CustomLink>

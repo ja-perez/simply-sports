@@ -6,7 +6,7 @@ export default function LearnBreadcrumb({
 }: { paths: string[] }) {
     return (
         <Breadcrumbs separator=">" aria-label="breadcrumb">
-            <CustomLink href="learn">
+            <CustomLink href="learn/introduction">
                 Learn
             </CustomLink>
             {paths.map((path, index) => (

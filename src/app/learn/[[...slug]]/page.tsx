@@ -29,6 +29,9 @@ export default async function LearnPage({
             <Typography variant="subtitle1">
                 {res.frontmatter.description}
             </Typography>
+            <div className="">
+                {res.content}
+            </div>
         </Container>
         </>
     )

@@ -29,7 +29,7 @@ const newsTeamsLink: NavLink = {
 const learnLink: NavLink = {
     name: 'learn',
     label: 'Learning Academy',
-    href: 'learn',
+    href: 'learn/introduction',
     icon: School,
     sections: ['introduction', 'terminology', 'resources']
 }
