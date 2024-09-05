@@ -178,7 +178,6 @@ function LeagueStandings() {
             </TableContainer>
         </>
     )
-
 }
 
 const match = {

@@ -28,89 +28,87 @@ export interface Article {
     }
 }
 
-export interface Video {
-    video_id: string;
-    title: string;
-    desription: string;
-    href: string
-    thumbnail: string;
-    metadata: {
-        site: string;
-        geoRestrictions: Array<string>;
-        embargoDate: Date;
-        expirationDate: Date;
-        date: string;
-    }
+export interface CustomImage {
+    href: string;
+    alt: string | "";
+    width: number;
+    height: number;
+    rel?: Array<string>;
 }
 
-export interface Match {
-    match_id: string;
-    teams: [
-        { team_info: Team },
-        { team_info: Team }
-    ],
-    venue: {
-        id: string;
-        fullName: string;
-        shortName: string;
-        address: {
-            city: string;
-            country: string;
-        }
-    },
-    odds: {
-        spread: {},
-        total: {},
-        moneyline: {}
-    },
-    media: {
-        article: Article,
-        videos: Array<Video>
-    }
-
-}
-
-export interface Sport {
-    id: string;
-    name: string;
-    league_ids: Array<string>;
-}
-
-export interface League {
-    id: string;
-    name: string;
-    team_ids: Array<string>;
+export interface Roster {
+    players: Array<Player>;
+    formation?: string;
 }
 
 export interface Team {
-    id: string;
+    id: number;
     name: string;
     abbreviation: string;
-    logos: [
-        {
-            href: string;
-            alt: string | "";
-            width: number;
-            height: number;
-        }
-    ]
+    homeAway: string;
+    score: number;
+    winner: boolean;
+    logos: Array<CustomImage>;
+    roster: Roster;
     metadata: {
         sport: string,
         league: string,
-    }
-    player_ids: Array<string>;
+    };
 }
 
 export interface Player {
     id: string;
-    first_name: string;
-    last_name: string;
-    image_url: string;
+    firstName: string;
+    lastName: string;
+    displayName?: string;
     position: string;
-    status: string;
+    status?: string;
+    starter?: boolean;
+    jersey: string;
     metadata: {
         sport: string,
         league: string,
-        team: string,
+        teamName: string,
+        teamId: number,
+    }
+}
+
+export interface TeamOdds {
+    favorite: boolean;
+    underdog: boolean;
+    moneyLine: number;
+    spreadOdds: number;
+    spread: number;
+}
+
+export interface Venue {
+    id: string;
+    name: string;
+    images: Array<CustomImage>
+}
+
+export interface Match {
+    label: string;
+    date: Date;
+    venue: Venue;
+    official: string;
+    metadata: {
+        sport: string;
+        league: string;
+        season: number;
+        seasonId?: number;
+    }
+    teams: {
+        "home": Team,
+        "away": Team,
+    }
+    odds: {
+        overUnder: number;
+        spread: number;
+        overOdds: number;
+        underOdds: number;
+        drawOdds?: number;
+        home: TeamOdds;
+        away: TeamOdds;
     }
 }

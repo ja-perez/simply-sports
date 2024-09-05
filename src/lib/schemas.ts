@@ -1,10 +1,13 @@
 import { Schema, model, Model } from 'mongoose';
 import { 
     Article,
-    Sport,
-    League,
     Team,
     Player,
+    Roster,
+    CustomImage,
+    Venue,
+    TeamOdds,
+    Match
 } from './definitions';
 
 var articleSchema = new Schema<Article>({
@@ -28,77 +31,96 @@ var articleSchema = new Schema<Article>({
 let articleModel: Model<Article>;
 try {
     articleModel = model<Article>('articles');
-} catch (err) {
+} catch (_) {
     articleModel = model<Article>('articles', articleSchema);
 }
 
-var sportSchema = new Schema<Sport>({
-    id: { type: String, required: true },
-    name: { type: String, required: true },
-    league_ids: { type: [String], required: true },
+var imageSchema = new Schema<CustomImage>({
+    href:  { type: String, required: true },
+    alt:  { type: String },
+    width:  { type: Number, required: true },
+    height:  { type: Number, required: true },
 })
-let sportModel: Model<Sport>;
-try {
-    sportModel = model<Sport>('sports');
-} catch (err) {
-    sportModel = model<Sport>('sports', sportSchema);
-}
 
-var leagueSchema = new Schema<League>({
+var playerSchema = new Schema<Player>({
     id: { type: String, required: true },
-    name: { type: String, required: true},
-    team_ids: { type: [String] },
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    displayName: { type: String, required: true },
+    position: { type: String, required: true },
+    status: { type: String, default:"Unknown" },
+    starter: { type: Boolean },
+    jersey: { type: String },
+    metadata: {
+        site: { type: String, required: true },
+        sport: { type: String, required: true },
+        league: { type: String, required: true },
+        date: { type: Date, required: true },
+    }
 })
-let leagueModel: Model<League>;
-try {
-    leagueModel = model<League>('leagues');
-} catch (err) {
-    leagueModel = model<League>('leagues', leagueSchema)
-}
+
+var rosterSchema = new Schema<Roster>({
+    players: [ playerSchema ],
+    formation: { type: String }
+})
 
 var teamSchema = new Schema<Team>({
-    id: { type: String, required: true },
+    id: { type: Number, required: true },
     name: { type: String, required: true},
     abbreviation: { type: String, default: ""},
-    logos: [
-        {
-            href: { type: String },
-            alt: { type: String },
-            width: { type: Number },
-            height: { type: Number },
-        }
-    ],
+    homeAway: { type: String },
+    logos: [ imageSchema ],
+    roster: rosterSchema,
     metadata: {
         sport: { type: String, required: true },
         league: { type: String, required: true },
     },
-    player_ids: { type: [String]}
 })
-let teamModel: Model<Team>;
-try {
-    teamModel = model<Team>('teams');
-} catch (err) {
-    teamModel = model<Team>('teams', teamSchema);
-}
 
-var playerSchema = new Schema<Player>({
-    id: { type: String, required: true },
-    first_name: { type: String, required: true },
-    last_name: { type: String, required: true },
-    image_url: { type: String },
-    position: { type: String, required: true },
-    status: { type: String, default: "UNKNOWN" },
+var venueSchema = new Schema<Venue>({
+    id: { type: String },
+    name: { type: String },
+    images: [ imageSchema ],
+})
+
+var teamOddsSchema = new Schema<TeamOdds>({
+    favorite: { type: Boolean, required: true},
+    underdog: { type: Boolean, required: true},
+    moneyLine: { type: Number, required: true},
+    spreadOdds: { type: Number, required: true},
+    spread: { type: Number, required: true},
+})
+
+var matchSchema = new Schema<Match>({
+    label: { type: String, required: true },
+    date: { type: Date, required: true },
+    venue: venueSchema,
+    official: { type: String },
     metadata: {
         sport: { type: String, required: true },
         league: { type: String, required: true },
-        team: { type: String}
+        season: { type: String, required: true },
+        seasonId: { type: String },
+    },
+    teams: {
+        home: teamSchema,
+        away: teamSchema,
+    },
+    odds: {
+        overUnder: { type: Number },
+        spread: { type: Number },
+        overOdds: { type: Number },
+        underOdds: { type: Number },
+        drawOdds: { type: Number },
+        home: teamOddsSchema,
+        away: teamOddsSchema,
     }
 })
-let playerModel: Model<Player>;
+let matchModel = Model<Match>
 try {
-    playerModel = model<Player>('players');
-} catch (err) {
-    playerModel = model<Player>('players', playerSchema);
+    matchModel = model<Match>('articles');
+} catch (_) {
+    matchModel = model<Match>('articles', matchSchema);
 }
 
-export { articleModel, sportModel, leagueModel, teamModel, playerModel }
+export { articleModel, matchModel }
