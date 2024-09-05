@@ -105,7 +105,7 @@ export default function PracticeSession() {
             </Grid>
             <Grid item xs={6}>
                 <Card sx={{display:'flex', justifyContent:'center', marginBottom:"10px"}}>
-                    <Button size="large" sx={{ width:"100%"}}>
+                    <Button size="large" sx={{ width:"100%"}} href="/practice/result">
                         Submit Betting Slip
                     </Button>
                 </Card>
