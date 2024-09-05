@@ -1,0 +1,35 @@
+{
+    "seasons": [
+        "2021", "2022", "2023", "2024"
+    ],
+    "sports": {
+        "soccer": {
+            "leagues": {
+                "premier-league": "eng.1",
+                "la-liga": "esp.1",
+                "mls": "usa.1"
+            },
+            "seasonTypes": {
+                "regular": 1
+            }
+        },
+        "football": {
+            "leagues": {
+                "nfl": "nfl"
+            },
+            "seasonTypes": {
+                "preseason": 1,
+                "regular": 2,
+                "postseason": 3
+            }
+        },
+        "baseball": {
+            "leagues": {
+                "mlb": "mlb"
+            },
+            "seasonTypes": {
+                "regular": 2
+            }
+        }
+    }
+}
