@@ -53,10 +53,8 @@ var playerSchema = new Schema<Player>({
     starter: { type: Boolean },
     jersey: { type: String },
     metadata: {
-        site: { type: String, required: true },
-        sport: { type: String, required: true },
-        league: { type: String, required: true },
-        date: { type: Date, required: true },
+        teamName: { type: String },
+        teamId: { type: String }
     }
 })
 

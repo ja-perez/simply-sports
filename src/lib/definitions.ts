@@ -66,10 +66,8 @@ export interface Player {
     starter?: boolean;
     jersey: string;
     metadata: {
-        sport: string,
-        league: string,
         teamName: string,
-        teamId: number,
+        teamId: string,
     }
 }
 
