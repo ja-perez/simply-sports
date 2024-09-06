@@ -81,6 +81,20 @@ export interface TeamOdds {
     spread: number;
 }
 
+export interface Odds {
+    provider: {
+        id: string,
+        name: string;
+    }
+    overUnder: number;
+    spread: number;
+    overOdds: number;
+    underOdds: number;
+    drawOdds?: number;
+    home: TeamOdds;
+    away: TeamOdds;
+}
+
 export interface Venue {
     id: string;
     name: string;
@@ -102,13 +116,5 @@ export interface Match {
         "home": Team,
         "away": Team,
     }
-    odds: {
-        overUnder: number;
-        spread: number;
-        overOdds: number;
-        underOdds: number;
-        drawOdds?: number;
-        home: TeamOdds;
-        away: TeamOdds;
-    }
+    odds: Array<Odds>
 }

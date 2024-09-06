@@ -7,6 +7,7 @@ import {
     CustomImage,
     Venue,
     TeamOdds,
+    Odds,
     Match
 } from './definitions';
 
@@ -69,6 +70,8 @@ var teamSchema = new Schema<Team>({
     name: { type: String, required: true},
     abbreviation: { type: String, default: ""},
     homeAway: { type: String },
+    score: { type: Number, required: true },
+    winner: { type: Boolean, required: true },
     logos: [ imageSchema ],
     roster: rosterSchema,
     metadata: {
@@ -91,6 +94,20 @@ var teamOddsSchema = new Schema<TeamOdds>({
     spread: { type: Number, required: true},
 })
 
+var oddsSchema = new Schema<Odds>({
+    provider: {
+        id: { type: String },
+        name: { type: String },
+    },
+    overUnder: { type: Number, required: true },
+    spread: { type: Number, required: true },
+    overOdds: { type: Number, required: true },
+    underOdds: { type: Number, required: true },
+    drawOdds: { type: Number },
+    home: teamOddsSchema,
+    away: teamOddsSchema,
+})
+
 var matchSchema = new Schema<Match>({
     label: { type: String, required: true },
     date: { type: Date, required: true },
@@ -106,15 +123,7 @@ var matchSchema = new Schema<Match>({
         home: teamSchema,
         away: teamSchema,
     },
-    odds: {
-        overUnder: { type: Number },
-        spread: { type: Number },
-        overOdds: { type: Number },
-        underOdds: { type: Number },
-        drawOdds: { type: Number },
-        home: teamOddsSchema,
-        away: teamOddsSchema,
-    }
+    odds: [ oddsSchema ]
 })
 let matchModel = Model<Match>
 try {
