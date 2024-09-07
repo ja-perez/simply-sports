@@ -125,9 +125,9 @@ var matchSchema = new Schema<Match>({
 })
 let matchModel = Model<Match>
 try {
-    matchModel = model<Match>('articles');
+    matchModel = model<Match>('matches');
 } catch (_) {
-    matchModel = model<Match>('articles', matchSchema);
+    matchModel = model<Match>('matches', matchSchema);
 }
 
 export { articleModel, matchModel }

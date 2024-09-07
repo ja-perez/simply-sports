@@ -1,17 +1,11 @@
 import { connect, connection } from 'mongoose';
 import {
     articleModel,
-    sportModel,
-    leagueModel,
-    teamModel,
-    playerModel,
+    matchModel
 } from '@/lib/schemas';
 import {
     Article,
-    Sport,
-    League,
-    Team,
-    Player,
+    Match
 } from '@/lib/definitions';
 
 
@@ -36,47 +30,6 @@ export async function connectToDatabase() {
     }
 }
 
-
-export async function fetchSports() {
-    try {
-        await connectToDatabase();
-        const sportsQuery = sportModel.find({}, { _id: 0, __v: 0 });
-        const sportsData = await sportsQuery.exec();
-        const sports: Sport[] = sportsData.map((sport) => sport.toJSON());
-        return sports;
-    } catch (err) {
-        console.error("Error fetching sports");
-        console.error("Error: ", err);
-    }
-}
-
-export async function fetchArticles() {
-    try {
-        await connectToDatabase();
-        const articlesQuery = articleModel.find({});
-        const articlesData = await articlesQuery.exec();
-        const articles: Article[] = articlesData.map((article) => article.toJSON());
-        return articles;
-    } catch (err) {
-        console.error("Error fetching articles");
-        console.error("Error: ", err);
-    }
-}
-
-export async function fetchArticleById(id: string) {
-    try {
-        await connectToDatabase();
-        const articleQuery = articleModel.findOne({ id: id }, { _id: 0, __v: 0, metadata: 0 });
-        const articleData = await articleQuery.exec();
-        if (articleData === null) {
-            throw new Error("Article not found: " + id);
-        }
-        const article = articleData.toObject();
-    } catch (err) {
-        console.error("Error fetching article");
-        console.error("Error: ", err);
-    }
-}
 
 export async function fetchArticlesByParams(params: { [key: string]: string }) {
     try {
@@ -105,62 +58,41 @@ export async function fetchArticlesByParams(params: { [key: string]: string }) {
 }
 
 
-export async function fetchArticlesBySportLeague(sport: string, league: string) {
+export async function fetchMatchById(id: string | number) {
     try {
         await connectToDatabase();
-        console.log(`Fetching articles for sport: ${sport}, league: ${league}`);
-        const sourcesQuery = articleModel.distinct("metadata.site");
-        const sources: String[] = await sourcesQuery.exec();
-
-        const articles = sources.map(async (source) => {
-            const sourceArticlesQuery = articleModel.find({
-                "metadata.site": source,
-            });
-            if (sport !== "all") {
-                sourceArticlesQuery.find({ sport: sport });
-            }
-            if (league !== "all") {
-                sourceArticlesQuery.find({ league: league });
-            }
-            const sourceArticlesData = await sourceArticlesQuery.limit(6).exec();
-            const sourceArticles: Article[] = sourceArticlesData.map((article) => article.toJSON());
-            return { source: source, articles: sourceArticles};
-        })
-        return articles;
+        const query = matchModel.findOne({"id":id})
+        const match: Match = await query.exec();
+        return match
     } catch (err) {
-        console.error("Error fetching articles");
+        console.error(`Error fetching match with id: ${id}`)
         console.error("Error: ", err);
         return null;
     }
 }
 
-export async function fetchArticlesBySourceSportLeague(source: string, sport: string, league: string) {
+export async function fetchMatchesByParams(params: { [key : string]: string }) {
     try {
         await connectToDatabase();
-        console.log(`Fetching articles for source: ${source}, sport: ${sport}, league: ${league}`);
-        var query = articleModel.aggregate([
-            { $match: {
-                source: source,
-                $or: [
-                    { sport: sport },
-                    { league: league },
-                ],
-            }}
-        ])
-     
-        var articlesQuery = articleModel.find({ source: source });
-        if (sport !== "all") {
-            articlesQuery = articlesQuery.find({ sport: sport });
-        }
-        if (league !== "all") {
-            articlesQuery = articlesQuery.find({ league: league });
-        }
-        const articlesData = await articlesQuery.limit(6).exec();
-        const articles: Article[] = articlesData.map((article) => article.toJSON());
-        console.log(`Fetched ${articles.length} articles`);
-        return articles;
+        const query = matchModel.find(params);
+        const matches: Array<Match> = await query.exec();
+        return matches
     } catch (err) {
-        console.error("Error fetching articles");
+        console.error(`Error fetching matches using params: ${params}`);
+        console.error("Error: ", err);
+        return null;
+    }
+}
+
+export async function fetchRandomMatch() {
+    try {
+        await connectToDatabase();
+        const matchCount = await matchModel.countDocuments().exec();
+        var randomEntry = Math.floor(Math.random() * matchCount);
+        const match = await matchModel.findOne().skip(randomEntry).exec()
+        return match
+    } catch (err) {
+        console.error(`Error fetching random match`);
         console.error("Error: ", err);
         return null;
     }

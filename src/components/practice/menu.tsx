@@ -14,8 +14,26 @@ import Card from "@mui/material/Card"
 import CardHeader from "@mui/material/CardHeader"
 import CardContent from "@mui/material/CardContent"
 import Button from "@mui/material/Button"
+import { Match } from "@/lib/definitions"
 
 export default function Menu() {
+
+    async function displayMatches(matches: Match) {
+        console.log(matches)
+    };
+    async function displayMatch(match: Match) {
+        console.log(match.id)
+    };
+
+    async function handleClick() {
+        // const res = await fetch("/api/matches")
+        // res.json().then(displayMatches)
+    };
+    async function handleRandomClick() {
+        // const res = await fetch("api/matches/random");
+        // res.json().then(displayMatch)
+    }
+
     return (
         <>
         <Container 
@@ -46,10 +64,10 @@ export default function Menu() {
                 />
                 <Divider flexItem/>
                 <CardContent sx={{ display:'flex', flexDirection:'column'}}>
-                    <Button variant="outlined" sx={{marginY:"5px"}}>
+                    <Button variant="outlined" sx={{marginY:"5px"}} onClick={handleClick}>
                         All matches
                     </Button>
-                    <Button variant="outlined" sx={{marginY:"5px"}}>
+                    <Button variant="outlined" sx={{marginY:"5px"}} onClick={handleRandomClick}>
                         Random match
                     </Button>
                     {process.env.MODE === "prod"

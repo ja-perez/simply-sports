@@ -100,6 +100,7 @@ export interface Venue {
 }
 
 export interface Match {
+    id: number;
     label: string;
     date: Date;
     venue: Venue;
