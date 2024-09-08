@@ -102,7 +102,7 @@ export interface Venue {
 export interface Match {
     id: number;
     label: string;
-    date: Date;
+    date: Date | string;
     venue: Venue;
     official: string;
     metadata: {

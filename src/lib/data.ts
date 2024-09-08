@@ -97,3 +97,37 @@ export async function fetchRandomMatch() {
         return null;
     }
 }
+
+
+export async function fetchMatchSports() {
+    try {
+        await connectToDatabase();
+        const query = matchModel.distinct("metadata.sport");
+        const sports = await query.exec();
+        return sports;
+    } catch (err) {
+        console.error(`Error fetching sports`);
+        console.error("Error: ", err);
+        return null;
+    }
+}
+
+export async function fetchMatchLeaguesBySport(sport: string) {
+    try {
+        await connectToDatabase();
+        const query = matchModel.distinct("metadata.league", { "metadata.sport": sport });
+        const sports = await query.exec();
+        return sports;
+    } catch (err) {
+        console.error(`Error fetching sports`);
+        console.error("Error: ", err);
+        return null;
+    }
+}
+
+export async function fetchTeamsByParams(params: { [key: string]: string}) {
+    try {
+    } catch (err) {
+
+    }
+}
