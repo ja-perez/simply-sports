@@ -4,7 +4,6 @@ from os import path, getcwd, listdir
 from pymongo import MongoClient
 from dotenv import dotenv_values
 
-
 def read_data_from_file(fp):
     data = {}
     with open(fp, 'r') as file:
@@ -15,57 +14,90 @@ def write_data_to_file(fp, data):
     with open(fp, 'w') as file:
         json.dump(data, file, indent=4)
 
-
-def getUniqueTeamNames(events):
-    teams = {}
+def processEventData(events):
+    data = {
+        "matches": {},
+        "standings": {},
+        "team_names": {},
+    }
     for event in events:
+        # Match date
+        # Note: var naming convention is: [source or property]_[value]_[format or none if obvious or built-in type]
+        event_datetime_iso = event["date"]
+        event_datetime_datetime = datetime.datetime.fromisoformat(event_datetime_iso)
+        event_date_datetime = event_datetime_datetime.date()
+
+        date_standings = data["standings"].get(str(event_date_datetime), {})
+
+        # Team Names
         competitors = event["competitions"][0]["competitors"]
+        draws_possible = False
         for competitor in competitors:
             team_data = competitor["team"]
-            if team_data["id"] not in teams:
-                teams[team_data["id"]] = {
-                    "name": team_data.get("name", team_data.get("shortDisplayName", team_data["id"])),
-                    "abbreviation": team_data["abbreviation"],
-                    "displayName": team_data["displayName"],
+            team_id = team_data["id"]
+
+            team_name = team_data.get("name") if team_data.get("name") else team_data.get("shortDisplayName")
+            team_abbreviation = team_data["abbreviation"]
+            team_displayName = team_data["displayName"]
+            if team_id not in data["team_names"]:
+                data["team_names"][team_id] = {
+                    "name": team_name,
+                    "abbreviation": team_abbreviation,
+                    "displayName": team_displayName
                 }
-    return teams
 
-def getUniqueMatchDates(events):
-    dates = set()
-    for event in events:
-        event_date_iso = event["date"]
-        event_date_datetime = datetime.datetime.fromisoformat(event_date_iso)
-        event_date = event_date_datetime.date()
-        dates.add(event_date)
-    return dates
+            try:
+                team_record = competitor["records"][0]["summary"].split("-")
+            except KeyError as _:
+                print(f"!Error processing competitor {team_id} for event {event["id"]}")
+                continue
+            wins = team_record[0]
+            losses = team_record[-1]
+            date_standings[team_id] = {
+                "w": int(wins), "l": int(losses), "team": data["team_names"][team_id]
+            }
+            draws = team_record[1] if len(team_record) == 3 else -1
+            if draws != -1:
+                draws_possible = True
+                date_standings[team_id]["d"] = int(draws)
+
+            data["standings"][str(event_date_datetime)] = date_standings
 
 
-def formatStandings(dates, teams):
-    standings = {}
-    for date in dates:
-        standings[str(date)] = {
-            id : {
-                "w": 0, "l": 0, "d": 0,
-                "metadata": teams[id]
-            } for id in teams
+
+        match_id = event["id"]
+        match_season = event["season"]
+        data["matches"][match_id] = {
+            "label": event["name"],
+            "shortName": event["shortName"],
+            "seasonId": match_season["slug"],
         }
-    return standings
+
+    standing_dates = [datetime.datetime.fromisoformat(date) for date in data["standings"]]
+    sorted_dates = sorted(standing_dates)
+    prev_records = {}
+    for date in sorted_dates:
+        standing = data["standings"][str(date.date())]
+        for team_id in data["team_names"]:
+            team_data = data["team_names"][team_id]
+            if team_id not in standing:
+                initial_vals = {"w": 0, "l": 0, "d": 0, "team": team_data} if draws_possible else {"w": 0, "l":0, "team": team_data}
+                prev_rec = prev_records.get(team_id, initial_vals)
+                data["standings"][str(date.date())][team_id] = prev_rec
+
+    return data
+
 
 def processSeasonScoreboardData(data):
     league_prop = data["leagues"][0]
-    season_data = league_prop["season"]
+
     events = data["events"]
-    teams = getUniqueTeamNames(events)
-    match_dates = getUniqueMatchDates(events)
-    standings = formatStandings(match_dates, teams)
+    match_data = processEventData(events)
     return {
-        "season": season_data["type"]["name"],
-        "seasonYear": season_data["year"],
-        "seasonId": season_data["displayName"],
-        "leagueDisplayName": league_prop["name"],
         "logos": league_prop["logos"],
-        "teams": teams,
-        "standings": standings,
+        "teams": match_data["team_names"],
+        "standings": match_data["standings"],
+        "matches": match_data["matches"]
     }
 
 
@@ -81,7 +113,7 @@ def processTeamData(teams):
             "winner": team_isWinner,
             "score": team_score,
             "id": team_data["id"],
-            "name": team_data["name"],
+            "name": team_data.get("name", team_data.get("displayName")),
             "abbreviation": team_data["abbreviation"],
             "logos": team_data["logos"],
         }
@@ -161,26 +193,44 @@ def processOddsData(data):
     return result
 
 def processMatchData(season_data, match_data):
-    match_boxscore = match_data["boxscore"]
-    match_header = match_data["header"]
-    match_gameinfo = match_data["gameInfo"]
-    match_header_competitions = match_header["competitions"][0]
-    match_header_competitors = match_header_competitions["competitors"]
-    match_venue = match_gameinfo["venue"]
-    match_officials = match_gameinfo.get("officials", [])
+    try:
+        match_boxscore = match_data["boxscore"]
+        match_header = match_data["header"]
+        match_gameinfo = match_data["gameInfo"]
 
+        match_header_competitions = match_header["competitions"][0]
+        match_header_competitors = match_header_competitions["competitors"]
+        match_venue = match_gameinfo["venue"]
+        match_officials = match_gameinfo.get("officials", [])
+    except KeyError as e:
+        print(f"!Error: Match {match_data["id"]} missing key properties for processing")
+        return {}
+
+    match_complete = match_header_competitions["status"]["type"]["completed"]
+    if not match_complete:
+        print(f"!Error: Match {match_data["id"]} was not completed")
+        return {}
+
+    match_season_data = match_header["season"]
+    match_league_data = match_header["league"]
     match_metadata = {
         "sport": season_data["sport"],
-        "league": season_data["league"],
-        "season": season_data["season"],
-        "seasonYear": season_data["seasonYear"],
-        "seasonId": season_data["seasonId"],
+        "league": match_league_data["name"],
+        "season": match_season_data.get("name", season_data["matches"][match_data["id"]]["seasonId"]),
+        "seasonYear": match_season_data["year"],
+        "seasonId": season_data["matches"][match_data["id"]]["seasonId"],
     }
 
     team_data = processTeamData(match_header_competitors)
     roster_data = {}
     if match_data.get("rosters"):
-        roster_data = processRosterData(match_data["rosters"])
+        try:
+            roster_data = processRosterData(match_data["rosters"])
+        except:
+            roster_data = {
+            "home": { "players": [] },
+            "away": { "players": [] }
+            }
     elif match_boxscore.get("players"):
         roster_data = {
             "home": { "players": [] },
@@ -192,8 +242,19 @@ def processMatchData(season_data, match_data):
     odds_prop = match_data.get("odds", match_data["pickcenter"])
     odds_data = processOddsData(odds_prop)
 
+    match_datetime = datetime.datetime.fromisoformat(match_header_competitions["date"])
+    match_date = match_datetime.date()
+    try:
+        match_standings = season_data["standings"][str(match_data)]
+    except KeyError as _:
+        print(f"!Error: No matching standings for {match_data["id"]}")
+        return {}
+
     match_data = {
-        "date": str(datetime.datetime.fromisoformat(match_header_competitions["date"])),
+        "id": match_data["id"],
+        "label": season_data["matches"][match_data["id"]]["label"],
+        "shortName": season_data["matches"][match_data["id"]]["shortName"],
+        "date": match_header_competitions["date"],
         "venue": {
             "id": match_venue["id"],
             "name": match_venue.get("fullName", match_venue.get("shortName")),
@@ -202,6 +263,7 @@ def processMatchData(season_data, match_data):
         "metadata": match_metadata,
         "teams": team_data,
         "odds": odds_data,
+        "standings": season_data["standings"][str(match_date)]
     }
     if match_officials:
         referee = "Unknown"
@@ -278,23 +340,19 @@ def main():
                 scoreboard_data = processSeasonScoreboardData(season_data)
                 scoreboard_data["league"] = league
                 scoreboard_data["sport"] = sport
-                scoreboard_data["matches"] = []
 
                 match_files = listdir(season_dir_path)
-                # match_files = []
 
                 for match_file_name in match_files:
                     match_id = match_file_name.split(".")[0]
                     match_file_path = path.join(season_dir_path, match_file_name)
                     with open(match_file_path, 'r') as file:
                         match_data = json.load(file)
-                    try:
-                        formatted_match_data = processMatchData(scoreboard_data, match_data)
-                    except:
-                        print(f"Error formatting data - skipping {sport} {league} {season} match {match_id}")
+                    match_data["id"] = match_id
+                    formatted_match_data = processMatchData(scoreboard_data, match_data)
                     if not formatted_match_data:
+                        print(f"Error formatting data - skipping {sport} {league} {season} match {match_id}")
                         continue
-                    formatted_match_data["id"] = match_id
                     upload_match_to_mongo(collection, formatted_match_data)
 
                 # scoreboard_data_output_path = path.join(matches_dir_path, f"{season}.json")
@@ -303,3 +361,5 @@ def main():
 
 if __name__=="__main__":
     main()
+
+
