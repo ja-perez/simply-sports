@@ -12,19 +12,24 @@ import Divider from '@mui/material/Divider';
 import Button from '@mui/material/Button';
 import Collapse from '@mui/material/Collapse';
 
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 
 import { Match } from '@/lib/definitions';
 
 const columns: GridColDef[] = [
-    { field: 'label', headerName: 'Match Name', width:550},
-    { field: 'date', headerName: 'Date', width:250},
+    { field: 'label', headerName: 'Match Name', width:350},
+    { field: 'date', headerName: 'Date', width:150},
+    { field: 'sport', headerName: 'Sport', width:100},
+    { field: 'league', headerName: 'League', width:150},
+    { field: 'homeTeam', headerName: 'Home Team', width:200},
+    { field: 'awayTeam', headerName: 'Away Team', width:200},
 ]
 
 export default function MenuActions() {
     const [showTable, setShowTable]  = useState(false);
     const [match, setMatch] = useState<Match | null>(null);
     const [matches, setMatches] = useState<Array<Match>>([]);
+
 
     function resetStates() {
         setMatch(null);
@@ -39,20 +44,29 @@ export default function MenuActions() {
             setMatch(null);
             setShowTable(!showTable);
             (await fetch('/api/matches')).json()
-            .then((data: Array<Match>) => {
+            .then((data: []) => {
                 setMatches(data)
             })
         }
     }
 
+    async function handleTableSelection(ids: GridRowSelectionModel) {
+        const selectedIds = new Set(ids);
+        const selectedRowData = matches.filter((match) =>
+            selectedIds.has(match.id.toString())
+        )
+        const selectedMatch = selectedRowData[0];
+        setMatch(selectedMatch);
+    }
+
     async function handleRandomMatch() {
-        if (showTable) resetStates();
+        if (showTable) {
+            setMatch(null);
+            setShowTable(false);
+        }
         (await fetch('/api/matches/random')).json()
         .then((data: Match) => {
-            if (typeof data.date === 'string') {
-                const matchDate = new Date(data.date)
-                data.date = matchDate.toDateString();
-            }
+            data.date = new Date(data.date)
             setMatch(data)
         });
     }
@@ -108,13 +122,7 @@ export default function MenuActions() {
                         },
                     }}
                     pageSizeOptions={[5]}
-                    onRowSelectionModelChange={(ids) => {
-                        const selectedIds = new Set(ids);
-                        const selectedRowData = matches.filter((match) =>
-                            selectedIds.has(match.id.toString()))
-                        const selectedMatch = selectedRowData[0];
-                        setMatch(selectedMatch);
-                    }}
+                    onRowSelectionModelChange={handleTableSelection}
                     />
             </Collapse>
         </Grid>

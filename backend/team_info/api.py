@@ -245,7 +245,7 @@ def processMatchData(season_data, match_data):
     match_datetime = datetime.datetime.fromisoformat(match_header_competitions["date"])
     match_date = match_datetime.date()
     try:
-        match_standings = season_data["standings"][str(match_data)]
+        match_standings = season_data["standings"][str(match_date)]
     except KeyError as _:
         print(f"!Error: No matching standings for {match_data["id"]}")
         return {}

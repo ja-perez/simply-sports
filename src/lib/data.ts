@@ -62,7 +62,8 @@ export async function fetchMatchById(id: string | number) {
     try {
         await connectToDatabase();
         const query = matchModel.findOne({"id":id})
-        const match: Match = await query.exec();
+        const result = await query.exec();
+        const match = {...result.toJSON(), date: new Date(result.date)}
         return match
     } catch (err) {
         console.error(`Error fetching match with id: ${id}`)
@@ -74,8 +75,20 @@ export async function fetchMatchById(id: string | number) {
 export async function fetchMatchesByParams(params: { [key : string]: string }) {
     try {
         await connectToDatabase();
-        const query = matchModel.find(params);
-        const matches: Array<Match> = await query.exec();
+        const query = matchModel.find(params, {
+            id: 1, label: 1, date: 1,
+            metadata: 1, venue: 1,
+            sport: "$metadata.sport",
+            league: "$metadata.league",
+            homeTeam: "$teams.home.name",
+            awayTeam: "$teams.away.name"
+        });
+        const result = await query.exec();
+        const matches = result.map((match) => (
+            {...match.toJSON(), 
+                date: (new Date(match.date)).toDateString(),
+            }
+        ))
         return matches
     } catch (err) {
         console.error(`Error fetching matches using params: ${params}`);
@@ -89,7 +102,8 @@ export async function fetchRandomMatch() {
         await connectToDatabase();
         const matchCount = await matchModel.countDocuments().exec();
         var randomEntry = Math.floor(Math.random() * matchCount);
-        const match = await matchModel.findOne().skip(randomEntry).exec()
+        const result = await matchModel.findOne().skip(randomEntry).exec()
+        const match: Match = {...result.toJSON(), date: new Date(result.date)}
         return match
     } catch (err) {
         console.error(`Error fetching random match`);
