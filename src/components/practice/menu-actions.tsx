@@ -14,6 +14,7 @@ import Collapse from '@mui/material/Collapse';
 
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 
+import CustomLink from '@/components/custom-link';
 import { Match } from '@/lib/definitions';
 
 const columns: GridColDef[] = [
@@ -172,9 +173,14 @@ function MatchSummary({
                     </div>
                 <div className="w-1/4 px-2 flex justify-center"
                 >
+                    <CustomLink
+                        href={`practice/session/${match?.id}`}
+                        key="practice-session-link">
                         <Button size="large" disabled={match === null} variant="contained">
                             Start Practice
                         </Button>
+                    </CustomLink>
+
                 </div>
             </CardContent>
         </Card>

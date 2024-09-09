@@ -8,5 +8,6 @@ export async function GET(
     const matchId = params.slug
     console.log(`Getting match with id: ${matchId}`)
     const res = await fetchMatchById(matchId)
+    if (!res) return NextResponse.json({})
     return NextResponse.json(res)
 }

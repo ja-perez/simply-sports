@@ -63,7 +63,7 @@ export async function fetchMatchById(id: string | number) {
         await connectToDatabase();
         const query = matchModel.findOne({"id":id})
         const result = await query.exec();
-        const match = {...result.toJSON(), date: new Date(result.date)}
+        const match = {...result.toJSON(), date: (new Date(result.date)).toDateString()}
         return match
     } catch (err) {
         console.error(`Error fetching match with id: ${id}`)

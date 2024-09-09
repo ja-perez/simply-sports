@@ -42,7 +42,7 @@ export const topBarRoutes: Array<NavLink> = [
         sections: [
             { id: "menu", label: "Menu", href: "menu" },
             { id: "dashboard", label: "Dashboard", href: "dashboard" },
-            { id: "tutorial", label: "Tutorial", href: "tutorial" },
+            { id: "session", label: "Session", href: "session" },
         ]
     }
 ]
