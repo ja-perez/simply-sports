@@ -41,6 +41,7 @@ export default async function Page({ params }: { params: { id: string }}) {
         <>
         <Grid container spacing={2}
             id="practice-session-container"
+            sx={{paddingBottom:"32px"}}
             >
             <Grid item xs={12}>
                 <SessionHeader match={match} />
