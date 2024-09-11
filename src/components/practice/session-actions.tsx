@@ -1,23 +1,23 @@
 'use client';
 import { useState } from 'react';
 
-import {
-    Grid,
-    Card,
-    CardHeader,
-    CardContent,
-    TableContainer,
-    Table,
-    TableBody,
-    TableCell,
-    TableRow,
-    TableHead,
-    Paper,
-    Button,
-    Divider,
-    Alert,
-    Typography
-} from "@mui/material"
+import Grid from "@mui/material/Grid";
+import Divider from "@mui/material/Divider";
+import Paper from "@mui/material/Paper";
+
+import Card from "@mui/material/Card";
+import CardHeader from "@mui/material/CardHeader";
+import CardContent from "@mui/material/CardContent";
+import Table from "@mui/material/Table";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableBody from "@mui/material/TableBody";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
+
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import Alert from "@mui/material/Alert";
 
 import { Odds, Team } from '@/lib/definitions';
 import { submitBetSlip, State, Results } from '@/lib/actions';
