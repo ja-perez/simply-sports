@@ -99,13 +99,6 @@ export default function MenuActions({
                     <Button variant="outlined" sx={{marginY:"5px"}} onClick={handleRandomMatch}>
                         Random match
                         </Button>
-
-                    {process.env.MODE === "prod"
-                    ? null
-                    : <Button id="dev" href="practice/session" variant="contained">
-                        practice session
-                        </Button>
-                    }
                 </CardContent>
             </Card>
         </Grid>

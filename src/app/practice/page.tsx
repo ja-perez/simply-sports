@@ -16,7 +16,7 @@ function formatURL(url: string) {
 export default function Practice() {
     const matchAPI = formatURL('api/matches')
     const randomAPI = formatURL('api/matches/random')
-    const sessionURL = formatURL('practice/sessions/')
+    const sessionURL = formatURL('practice/session/')
     const fetchURLs = {
         match: matchAPI,
         random: randomAPI,
