@@ -7,7 +7,21 @@ import Disclaimer from '@/components/practice/disclaimer';
 import MenuActions from '@/components/practice/menu-actions';
 import CustomLink from '@/components/custom-link';
 
+
+function formatURL(url: string) {
+    const basePath = process.env.BASE_PATH || "/";
+    return basePath + url;
+}
+
 export default function Practice() {
+    const matchAPI = formatURL('api/matches')
+    const randomAPI = formatURL('api/matches/random')
+    const sessionURL = formatURL('practice/sessions/')
+    const fetchURLs = {
+        match: matchAPI,
+        random: randomAPI,
+        session: sessionURL,
+    }
     return (
         <>
         <Grid container spacing={2}
@@ -39,7 +53,7 @@ export default function Practice() {
                 <Disclaimer />
                 </Grid>
 
-            <MenuActions />
+            <MenuActions fetchURLs={fetchURLs}/>
         </Grid>
         </>
     );

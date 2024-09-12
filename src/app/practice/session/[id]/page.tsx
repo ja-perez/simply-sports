@@ -51,7 +51,7 @@ export default async function Page({ params }: { params: { id: string }}) {
                 <SessionDetails match={match} />
             </Grid>
 
-            <SessionActions match={formattedMatch}/>
+            <SessionActions match={formattedMatch} basePath={process.env.BASE_PATH || "/"}/>
         </Grid>
         </>
     )

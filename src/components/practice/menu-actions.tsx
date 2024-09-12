@@ -14,7 +14,7 @@ import Collapse from '@mui/material/Collapse';
 
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 
-import CustomLink from '@/components/custom-link';
+import Link from 'next/link';
 import { Match } from '@/lib/definitions';
 
 const columns: GridColDef[] = [
@@ -26,7 +26,15 @@ const columns: GridColDef[] = [
     { field: 'awayTeam', headerName: 'Away Team', width:200},
 ]
 
-export default function MenuActions() {
+export default function MenuActions({
+    fetchURLs
+}: {
+    fetchURLs: {
+        match: string,
+        random: string,
+        session: string
+    }
+}) {
     const [showTable, setShowTable]  = useState(false);
     const [match, setMatch] = useState<Match | null>(null);
     const [matches, setMatches] = useState<Array<Match>>([]);
@@ -44,7 +52,7 @@ export default function MenuActions() {
         } else {
             setMatch(null);
             setShowTable(!showTable);
-            (await fetch('/api/matches')).json()
+            (await fetch(fetchURLs.match)).json()
             .then((data: []) => {
                 setMatches(data)
             })
@@ -65,7 +73,7 @@ export default function MenuActions() {
             setMatch(null);
             setShowTable(false);
         }
-        (await fetch('/api/matches/random')).json()
+        (await fetch(fetchURLs.random)).json()
         .then((data: Match) => {
             data.date = new Date(data.date)
             setMatch(data)
@@ -129,7 +137,7 @@ export default function MenuActions() {
         </Grid>
 
         <Grid item xs={12}>
-            <MatchSummary match={match} />
+            <MatchSummary match={match} sessionURL={fetchURLs.session}/>
         </Grid>
         </>
     )
@@ -137,8 +145,12 @@ export default function MenuActions() {
 
 
 function MatchSummary({
-    match
-}: { match: Match | null }) {
+    match,
+    sessionURL
+}: { 
+    match: Match | null,
+    sessionURL: string,
+ }) {
     if (match === undefined) match = null;
     const matchHeader = match !== null
     ? (match.metadata.sport === 'soccer'
@@ -173,13 +185,13 @@ function MatchSummary({
                     </div>
                 <div className="w-1/4 px-2 flex justify-center"
                 >
-                    <CustomLink
-                        href={`practice/session/${match?.id}`}
+                    <Link
+                        href={match?.id ? sessionURL + match?.id : ""}
                         key="practice-session-link">
                         <Button size="large" disabled={match === null} variant="contained">
                             Start Practice
                         </Button>
-                    </CustomLink>
+                    </Link>
 
                 </div>
             </CardContent>

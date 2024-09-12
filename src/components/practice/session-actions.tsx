@@ -21,7 +21,7 @@ import Alert from "@mui/material/Alert";
 
 import { Odds, Team } from '@/lib/definitions';
 import { submitBetSlip, State, Results } from '@/lib/actions';
-import CustomLink from '@/components/custom-link';
+import Link from 'next/link';
 
 interface SessionMatch {
     id: string;
@@ -40,7 +40,13 @@ interface SlipChoices {
 }
 
 
-export default function SessionActions({ match }: { match : SessionMatch }) {
+export default function SessionActions({ 
+    match,
+    basePath
+ }: { 
+    match : SessionMatch,
+    basePath: string,
+}) {
     const initialState: State = { message: "", errors: {}, success: false, results: {} };
     const [state, setState] = useState(initialState);
 
@@ -199,11 +205,11 @@ export default function SessionActions({ match }: { match : SessionMatch }) {
                             }}>
                             Reset Session
                         </Button>
-                        <CustomLink href="practice" {...{className: "w-full my-1"}}>
+                        <Link href={basePath + "practice"} className="w-full my-1">
                             <Button size="large" variant="contained" sx={{width:"100%"}}>
                                 Return to Practice Lounge
                             </Button>
-                        </CustomLink>
+                        </Link>
                     </CardContent>
                 </Card>
             </Grid>
